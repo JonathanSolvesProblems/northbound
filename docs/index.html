@@ -35,7 +35,7 @@
 */
 
 :root{
-  --road:#2E3032; --shoulder:#4A4C4E; --lane:#D9D6CF;
+  --road:#31302D; --shoulder:#4B4A46; --lane:#D9D6CF;
   --sign:#0A6B3F; --sign-edge:#178A52; --sign-shadow:#061C11; --on-sign:#F4F3EF; --on-sign-dim:#BFE3CF;
   --warn:#F5C400; --on-warn:#161616; --stop:#B8102E; --on-stop:#F4F3EF;
   --road-text:#E6E4DF; --road-muted:#A9A7A2;
@@ -45,10 +45,10 @@
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --road:#B4B5B2; --shoulder:#CBCCC8; --lane:#F6F5F2;
-    --sign:#0E7A47; --sign-edge:#1C9A5C; --sign-shadow:#083A22; --on-sign:#FFFFFF; --on-sign-dim:#CFEBDB;
+    --road:#B6B4AF; --shoulder:#CCCAC5; --lane:#F6F5F2;
+    --sign:#0E7A47; --sign-edge:#1C9A5C; --sign-shadow:#083A22; --on-sign:#FFFFFF; --on-sign-dim:#E6F6EC;
     --warn:#FFCC00; --on-warn:#161616; --stop:#C41230; --on-stop:#FFFFFF;
-    --road-text:#1E1F21; --road-muted:#4E5052;
+    --road-text:#1E1F21; --road-muted:#383A3C;
   }
 }
 *{box-sizing:border-box}
@@ -61,6 +61,7 @@ body{
   font-variant-numeric:tabular-nums;
 }
 a{color:inherit}
+a:focus-visible{outline:3px solid var(--warn);outline-offset:3px;border-radius:2px}
 .road{max-width:1120px;margin:0 auto;padding:0 28px 96px;position:relative}
 /* the shoulder line, full height, left of the signs */
 .road::before{content:"";position:absolute;left:6px;top:0;bottom:0;width:4px;background:var(--lane);opacity:.55}
@@ -130,7 +131,8 @@ th,td{text-align:left;padding:11px 8px;border-bottom:2px solid rgba(255,255,255,
 th{font-weight:500;color:var(--on-sign-dim);font-size:15px;text-transform:uppercase;letter-spacing:.05em}
 td.n,th.n{text-align:right}
 td.n{font-weight:700;color:#fff}
-tr.hot td{color:var(--warn)}tr.hot td.n{color:var(--warn)}
+tr.hot td{color:#fff;font-weight:700}
+tr.hot td:first-child::before{content:"";display:inline-block;width:11px;height:11px;background:var(--warn);transform:rotate(45deg);margin:0 12px 1px 2px;box-shadow:0 0 0 1.5px var(--on-warn)}
 
 /* the arrow */
 .arrow{display:inline-block;width:.9em;height:.9em;vertical-align:-.08em;margin-left:.15em}
@@ -158,7 +160,7 @@ tr.hot td{color:var(--warn)}tr.hot td.n{color:var(--warn)}
 
 /* ---- screens: the software, mounted on the gantry ---- */
 figure{margin:28px 0 6px}
-figure video,figure img{width:100%;display:block;background:#000;border-radius:6px}
+figure video,figure img{width:100%;display:block;background:#000;border-radius:3px}
 .screen{background:var(--screen);padding:10px;border-radius:9px;
   box-shadow:0 0 0 1px var(--screen-edge),4px 5px 0 0 var(--sign-shadow)}
 figcaption{margin-top:12px;font-size:15px;color:var(--on-sign-dim)}
