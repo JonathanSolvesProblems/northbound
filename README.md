@@ -106,12 +106,12 @@ Every entry at a sponsored hackathon says the sponsor's product was essential. T
 | | GLM 5.2 | no model |
 |---|---:|---:|
 | origin + destination read correctly | 100% | 40% |
-| weight | 83% | 63% |
+| weight | 81% | 61% |
 | **correct legal verdict reached** | **100%** | **40%** |
 
 The regex arm is a fair opponent, not a strawman. It matches the model on structured formats (header blocks, formal email) and fails completely on the three informal formats freight actually arrives in: trader shorthand, chat messages, forwarded chains. That is where the model earns its place.
 
-`npx tsx src/cli/ablation.ts 100` reproduces it. Currently n = 30; the n = 100 run is in `docs/`.
+`npx tsx src/cli/ablation.ts 100` reproduces it. n = 100, zero read failures, run recorded in `docs/ablation-n100.txt`.
 
 ### The refusal is the point
 

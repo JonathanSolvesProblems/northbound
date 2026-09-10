@@ -97,5 +97,5 @@ typescript, node, glm-5.2, spur-compute, python, cbp-border-wait-times, geonames
 - Tagline is 103 characters. Devpost's limit is generous, but the portal's may not be; check the field before pasting and trim to the first sentence if it truncates.
 - "How I built it" names GLM 5.2 on SPUR four times and never describes it as doing the boring parts. That is deliberate.
 - Every number above is one `check_claims.py` verifies. Run `npm run validate` before pasting.
-- The ablation figures are from n = 30. If the n = 100 run lands with different values, update the "How I built it" block AND the README together, then re-run the checker.
-- Links to add at paste time: public repo URL, demo video URL. Neither exists yet.
+- The ablation figures are from n = 100, recorded in `docs/ablation-n100.txt`, and locked by `check_claims.py`.
+- Repo: https://github.com/JonathanSolvesProblems/northbound. Video URL to add once uploaded.

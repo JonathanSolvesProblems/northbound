@@ -155,12 +155,12 @@ async function main(): Promise<void> {
   console.log(`  ${'could not read at all'.padEnd(22)}${pct(withModel.unreadable, t)}      ${pct(withoutModel.unreadable, t)}`);
 
   console.log('\n  Where the model earns its place, by format:\n');
-  console.log(`  ${'FORMAT'.padEnd(20)}${'n'.padStart(4)}${'GLM 5.2'.padStart(10)}${'no model'.padStart(10)}`);
+  console.log(`  ${'FORMAT'.padEnd(20)}${'n'.padStart(4)}   ${'GLM 5.2'.padStart(7)}      ${'no model'.padStart(8)}`);
   console.log('  ' + '-'.repeat(44));
   for (const s of STYLE_NAMES) {
     const c = counts[s] ?? 0;
     if (!c) continue;
-    console.log(`  ${s.padEnd(20)}${String(c).padStart(4)}${pct(styleWith[s].verdict, c)}      ${pct(styleWithout[s].verdict, c)}`);
+    console.log(`  ${s.padEnd(20)}${String(c).padStart(4)}   ${pct(styleWith[s].verdict, c)}      ${pct(styleWithout[s].verdict, c)}`);
   }
   console.log('');
 }

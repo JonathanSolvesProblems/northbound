@@ -160,6 +160,28 @@ RETIRED = {
 }
 
 
+ABLATION = os.path.join(ROOT, 'docs', 'ablation-n100.txt')
+
+
+def ablation_claims():
+    """The ablation needs model calls, so its ground truth is the recorded run.
+    The docs must quote exactly what that file says, or nothing at all."""
+    if not os.path.exists(ABLATION):
+        return {}
+    txt = open(ABLATION, encoding='utf-8').read()
+    m = re.search(r'CORRECT LEGAL VERDICT\s+(\d+)%\s+(\d+)%', txt)
+    n = re.search(r'(\d+) real orders', txt)
+    if not m:
+        return {}
+    out = {
+        'ablation: verdict with model':    f'{m.group(1)}%',
+        'ablation: verdict without model': f'{m.group(2)}%',
+    }
+    if n:
+        out['ablation: n'] = f'n = {n.group(1)}'
+    return out
+
+
 def main() -> int:
     c = compute()
     docs = {p: open(p, encoding='utf-8').read() for p in DOCS}
@@ -170,7 +192,8 @@ def main() -> int:
         print(f'  {k:<24} {fmt(val)}')
     print()
 
-    for label, needle in expected_strings(c).items():
+    expected = {**expected_strings(c), **ablation_claims()}
+    for label, needle in expected.items():
         hit = [os.path.basename(p) for p, t in docs.items() if needle in t]
         if hit:
             print(f'  ok      {label:<26} "{needle}"  in {", ".join(hit)}')

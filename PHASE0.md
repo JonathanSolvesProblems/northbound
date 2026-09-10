@@ -110,12 +110,12 @@ Every entry at a sponsored hackathon asserts the sponsor's product was essential
 
 Ground truth is Roadstar's own order book (origin, destination, weight, equipment, pickup date from `Tlorder`). The phrasings are mine, modelled on five formats freight actually arrives in, and both arms see byte-identical text.
 
-**n = 30, preliminary (n = 100 running):**
+**n = 100, zero read failures. Recorded in `docs/ablation-n100.txt`.**
 
 | | GLM 5.2 | no model | delta |
 |---|---:|---:|---:|
 | origin + destination | 100% | 40% | +60pp |
-| weight | 83% | 63% | +20pp |
+| weight | 81% | 61% | +20pp |
 | equipment | 100% | 100% | 0 |
 | pickup date | 80% | 80% | 0 |
 | **correct legal verdict** | **100%** | **40%** | **+60pp** |
@@ -208,7 +208,7 @@ Legality checks stay deterministic and cite their provision. The split is safe (
 | 3 | Served, not supervised | PASS. Beneficiary: the dispatcher. Gets a specific load on a specific truck with a rate, not a reminder. |
 | 4 | Pitch sentence | PASS. Human subject, nameable genre. |
 | 5 | Headline number + external grader | **PASS, delivered.** 217 legs / 66,702 miles / $155,815, graded by Roadstar's own dispatch records, 19 CFR 123.14(c)(1), GeoNames and ATRI. Locked behind tests. The model sits in the judged path (the offer reader), and the ablation proves it is load-bearing. |
-| 6 | Real, AI-native, sponsor surface, **ablation** | **PASS.** Runs live on the provided data and live CBP. GLM 5.2 on SPUR reads every offer. **Ablation shipped:** 100% correct verdict with the model, 40% without (n=30, n=100 running). The artifact is never less real than the sentence describing it. |
+| 6 | Real, AI-native, sponsor surface, **ablation** | **PASS.** Runs live on the provided data and live CBP. GLM 5.2 on SPUR reads every offer. **Ablation shipped:** 100% correct verdict with the model, 40% without (n=100). The artifact is never less real than the sentence describing it. |
 | 7 | Crowd count, revised | NOT MEASURABLE (gallery unpublished), and freight optimisation is the hackathon's own theme, so this converts to the one sentence no competitor can say. **Written:** "217 empty legs in Roadstar's own history were legally allowed to carry freight, and nobody knew." |
 | 8 | Whose budget | STRONG PASS. Filled legs are revenue on miles already being paid for. The GM judging this runs the fleet whose money it is. |
 

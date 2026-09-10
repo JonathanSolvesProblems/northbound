@@ -105,9 +105,37 @@ Total about 4:10.
 
 ---
 
+## B-roll is already captured
+
+Every shot below exists as video in `broll/`, recorded automatically from the real commands on the real data:
+
+```bash
+python scripts/broll.py            # run every command, record each as 1920x1080 mp4
+python scripts/broll.py --replay   # re-record from the captured output, no re-running
+python scripts/cards.py            # title and end cards, with the headshot
+```
+
+| File | Length | What it holds on |
+|---|---|---|
+| `01-title.mp4` | 4s | branded card |
+| `02-empty-miles.mp4` | 10s | the four-row lane table |
+| `03-the-rule.mp4` | 12s | the (c)(1) quote |
+| `04-headline.mp4` | 13s | the boxed $155,815 |
+| `05-offer-amber.mp4` | 16s | AMBER, both citations |
+| `06-offer-red.mp4` | 22s | RED, the § 592 line |
+| `07-board.mp4` | 17s | Driver84, `LOSES 42.1h` |
+| `08-overlap.mp4` | 14s | the Fairburn / Atlanta pairing |
+| `09-ablation.mp4` | 14s | the `CORRECT LEGAL VERDICT` row |
+| `10-check-claims.mp4` | 11s | `PASS` |
+| `11-close.mp4` | 5s | branded card with tagline and repo |
+
+Each clip opens on the command being typed, streams the real output, then eases to the line named above and holds. Beside each `.mp4` is a `.png` of the final frame and a `.txt` of the raw output, so anyone can confirm nothing on screen was edited.
+
+**Only the narration is left.** Record it against the script above, then either assemble with vidkit (`vidkit assemble narration.mp3 --clips-dir broll --out demo.mp4`) or drop the clips into any editor in numerical order.
+
 ## Shot list, exact commands
 
-Run each in a fresh terminal at the repo root. `set -a; . ./.env; set +a` first for anything that calls the model.
+The same commands, if you would rather screen-record by hand. Run each in a fresh terminal at the repo root. `set -a; . ./.env; set +a` first for anything that calls the model.
 
 | Shot | Command | Hold on |
 |---|---|---|

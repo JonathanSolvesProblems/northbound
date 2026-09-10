@@ -30,3 +30,10 @@ data/ref/admin1*.txt
 # OS
 .DS_Store
 Thumbs.db
+
+# Demo b-roll and renders. Raw media never goes in the repo.
+broll/
+_videos/
+*.webm
+*.edit-plan.json
+demo.mp4
