@@ -1,0 +1,28 @@
+
+================================================================================
+  ABLATION  ·  what does SPUR's GLM 5.2 contribute to Northbound?
+================================================================================
+
+  100 real orders from Roadstar's book, rendered in 5 broker formats.
+  Both arms read byte-identical text. Ground truth is their order record.
+
+  FIELD                    GLM 5.2  no model    delta
+  ---------------------------------------------------
+  origin + destination  100%       40%      +60pp           
+  weight                 81%       61%      +20pp           
+  equipment             100%      100%      +0pp            
+  pickup date            79%       80%      -1pp            
+  ---------------------------------------------------
+  CORRECT LEGAL VERDICT 100%       40%      +60pp
+  could not read at all   0%       60%
+
+  Where the model earns its place, by format:
+
+  FORMAT                 n   GLM 5.2      no model
+  --------------------------------------------
+  trader shorthand      20   100%        0%
+  header block          20   100%      100%
+  email prose           20   100%      100%
+  chat message          20   100%        0%
+  forwarded chain       20   100%        0%
+

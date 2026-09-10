@@ -62,7 +62,7 @@ SHOTS = [
          cmd=[PY, 'scripts/overlap.py'], show='python scripts/overlap.py',
          focus='FAIRBURN', hold=7),
     dict(id='09-ablation', title='With the model, and without',
-         cmd=[NPX, 'tsx', 'src/cli/ablation.ts', '30'], show='npx tsx src/cli/ablation.ts 30',
+         cmd=[NPX, 'tsx', 'src/cli/ablation.ts', '100'], show='npx tsx src/cli/ablation.ts 100',
          focus='CORRECT LEGAL VERDICT', hold=8, slow=True),
     dict(id='10-check-claims', title='The prose cannot drift from the data',
          cmd=[PY, 'scripts/check_claims.py'], show='python scripts/check_claims.py',

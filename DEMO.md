@@ -8,100 +8,90 @@ This video is the entire presentation, since the entry is submitted remotely. Ta
 
 ## Narration, with timings
 
+Opens on the page so a judge has the identity in three seconds, then cuts to the
+terminal wherever realness is the point. Every number spoken is one
+`check_claims.py` verifies. Nothing is seeded.
+
 ```
-0:00  [SHOT 1: title card]
+0:00  [00-page-hero, the sign with the sweep]
       Roadstar Trucking runs 82 trucks out of Milton, Ontario, into the
       United States. This hackathon handed me two months of their dispatch
       history. I built Northbound on it, and the first thing the data did
       was prove me wrong.
 
-0:18  [SHOT 2: empty_miles.py output, the lane table]
+0:16  [02-empty-miles, terminal, the lane table]
       I assumed a Canadian carrier's problem is coming home empty from the
       Midwest. Six legs. Two thousand miles. In two months. They are good
-      at loading for home.
+      at loading for home. The empty running is INSIDE the States, between
+      loads. Seven hundred and seventy-eight legs. A hundred and twenty-six
+      thousand miles.
 
-      The empty running is inside the States, between loads. Seven hundred
-      and seventy-eight legs. A hundred and twenty-six thousand miles.
-
-0:40  [SHOT 3: LEGAL.md, the 19 CFR 123.14(c)(1) quote highlighted]
+0:36  [00-page-scroll, gliding down to the three verdict signs]
       Here is the part nobody prices. A Canadian truck cannot haul US
       freight that moves away from home. Everyone knows that. But the
       regulation is not a flat no. Nineteen CFR one-twenty-three point
       fourteen says carriage "as part of the return of the vehicle to its
       base country" is incidental to international traffic. Allowed.
-
       So it is directional. Which way is the load going.
 
-1:05  [SHOT 4: fillable.py output, the headline block]
+1:00  [00-page-headline, the destination list]
       Two hundred and seventeen of those empty legs were already pointed at
       the border. Sixty-six thousand seven hundred miles. Every one of them
-      could legally have been carrying freight. At ATRI's published
-      industry cost, that is a hundred and fifty-five thousand dollars in
-      two months, on running they were already paying for.
+      could legally have been carrying freight. At ATRI's published industry
+      cost, that is a hundred and fifty-five thousand dollars in two months,
+      on running they were already paying for.
 
-1:28  [SHOT 5: offer.ts, Fairburn GA -> Walton KY, AMBER]
+1:22  [05-offer-amber, terminal]
       Northbound is the load board that knows the difference. A dispatcher
       pastes the offer the way it arrived. GLM 5.2 on SPUR reads it: van,
       forty-two thousand pounds, fourteen-fifty all in, pickup on the
-      twelfth. Then the law decides.
+      twelfth. Then the law decides. Fairburn to Walton is US domestic, and
+      it is heading home. Amber. Worth a call to your broker. Roadstar ran
+      that exact lane empty ten times.
 
-      Fairburn to Walton is US domestic, and it is heading home. Amber.
-      Worth a call to your broker. Here is the provision. Roadstar ran that
-      exact lane empty ten times in two months.
+1:52  [06-offer-red, terminal]
+      Now the one that looks like easy money. Columbus to Atlanta,
+      twenty-one hundred dollars, your truck is sitting right there.
+      Red. Not offered. Moving away from home is the cabotage violation the
+      regulation warns of: section 592 liabilities, and the driver's B-1
+      admission at risk on his next entry. Twenty-one hundred dollars is
+      not worth the truck.
 
-2:00  [SHOT 6: offer.ts, Columbus OH -> Atlanta GA, RED]
-      Now the one that looks like easy money. Columbus to Atlanta, twenty-one
-      hundred dollars, your truck is sitting right there.
-
-      Red. Not offered to this truck. Moving away from home is the cabotage
-      violation the regulation warns of: section 592 liabilities, and the
-      driver's B-1 admission at risk on his next entry. Twenty-one hundred
-      dollars is not worth the truck.
-
-2:25  [SHOT 7: board.ts, Driver84's block]
+2:18  [07-board, terminal, Driver84]
       It also knows the clock changes at the bridge. Roadstar's own system
       tracks US and Canadian hours as separate columns, and eighty-eight
-      percent of their drivers carry a different number on each.
+      percent of their drivers carry a different number on each. Driver84.
+      Fifty-three hours on the US cycle. Eleven the moment he crosses. And
+      the wait at the bridge never touches his driving limit; past thirty
+      minutes it counts as the break he already owed. Live from CBP.
 
-      Driver84. Fifty-three hours on the US cycle. Eleven the moment he
-      crosses. His board says he is fine. He is not.
-
-      And the wait at the bridge never touches his driving limit. It costs
-      the fourteen-hour window instead, and past thirty minutes it counts as
-      the break he already owed. Live from CBP, both lanes.
-
-2:55  [SHOT 8: overlap.py output, the Fairburn / Atlanta pairing]
+2:48  [08-overlap, terminal, the Fairburn / Atlanta pairing]
       Now the one I did not expect. A hundred and twenty times in two
-      months, a Roadstar truck ran empty toward the border within a
-      hundred and fifty kilometres and forty-eight hours of a Roadstar load
-      going to Ontario.
+      months, a Roadstar truck ran empty toward the border within a hundred
+      and fifty kilometres and forty-eight hours of a Roadstar load going to
+      Ontario. Driver67 ran empty out of Fairburn, Georgia. The day before,
+      their own load left Atlanta for Etobicoke. Twenty miles apart. Same
+      company. Two trucks. One of them empty.
 
-      Driver67 ran empty out of Fairburn, Georgia. The day before, their own
-      load left Atlanta for Etobicoke. Those towns are twenty miles apart.
-      Same company. Two trucks. One of them empty.
-
-3:22  [SHOT 9: ablation.ts output, the verdict row]
+3:14  [09-ablation, terminal]
       Everyone at a sponsored hackathon says the sponsor's model was
-      essential. I measured it. Same offers, read twice, once by GLM 5.2 and
-      once by a real regex parser with the model off.
+      essential. I measured it. Same hundred offers, read twice: once by
+      GLM 5.2, once by a real regex parser with the model off. With the
+      model, a hundred percent reach the correct legal verdict. Without it,
+      forty. The regex handles a tidy header block. It cannot read a chat
+      message or a forwarded email, and that is what freight looks like.
 
-      With the model, a hundred percent of offers reach the correct legal
-      verdict. Without it, forty. The regex handles a tidy header block
-      fine. It cannot read a chat message or a forwarded email, and that is
-      what freight actually looks like.
+3:38  [10-check-claims, terminal]
+      Every number I just said is recomputed from the raw sheets by a script
+      that fails the build if the prose and the data disagree. The first
+      time I ran it, it caught four mistakes in my own writeup.
 
-3:45  [SHOT 10: check_claims.py, the PASS line]
-      One more thing. Every number I just said is recomputed from the raw
-      sheets by a script that fails the build if the prose and the data
-      disagree. The first time I ran it, it caught four mistakes in my own
-      writeup.
-
-3:58  [SHOT 11: title card with the tagline]
+3:50  [00-page-close, then 11-close card]
       Northbound. Your truck already drove that lane, empty. This finds the
       freight it could legally have carried.
 ```
 
-Total about 4:10.
+Total about 4:00.
 
 ---
 
@@ -112,11 +102,17 @@ Every shot below exists as video in `broll/`, recorded automatically from the re
 ```bash
 python scripts/broll.py            # run every command, record each as 1920x1080 mp4
 python scripts/broll.py --replay   # re-record from the captured output, no re-running
+python scripts/broll.py --page     # record the deployed project page, scrolling
 python scripts/cards.py            # title and end cards, with the headshot
 ```
 
 | File | Length | What it holds on |
 |---|---|---|
+| `00-page-hero.mp4` | 6s | the sign, headlight sweep on entry |
+| `00-page-scroll.mp4` | 22s | a slow glide from the top to the headline sign |
+| `00-page-headline.mp4` | 10s | 217 / 66,702 / $155,815 as a destination list |
+| `00-page-verdicts.mp4` | 11s | the two offer recordings inside the sign |
+| `00-page-close.mp4` | 9s | the footer shield and links |
 | `01-title.mp4` | 4s | branded card |
 | `02-empty-miles.mp4` | 10s | the four-row lane table |
 | `03-the-rule.mp4` | 12s | the (c)(1) quote |
@@ -125,7 +121,7 @@ python scripts/cards.py            # title and end cards, with the headshot
 | `06-offer-red.mp4` | 22s | RED, the § 592 line |
 | `07-board.mp4` | 17s | Driver84, `LOSES 42.1h` |
 | `08-overlap.mp4` | 14s | the Fairburn / Atlanta pairing |
-| `09-ablation.mp4` | 14s | the `CORRECT LEGAL VERDICT` row |
+| `09-ablation.mp4` | 14s | the `CORRECT LEGAL VERDICT` row, n = 100 |
 | `10-check-claims.mp4` | 11s | `PASS` |
 | `11-close.mp4` | 5s | branded card with tagline and repo |
 
