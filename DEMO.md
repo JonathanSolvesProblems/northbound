@@ -142,7 +142,7 @@ RoadStar Hackathon 2026
 Your truck already drove that lane. Empty.
 Northbound finds the freight it could legally have carried.
 
-github.com/<user>/northbound
+github.com/JonathanSolvesProblems/northbound
 ```
 
 ---

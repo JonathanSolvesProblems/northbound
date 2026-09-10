@@ -21,7 +21,7 @@ export interface ModelConfig {
 export function readConfig(env: NodeJS.ProcessEnv = process.env): ModelConfig {
   return {
     baseUrl: env.SPUR_BASE_URL || env.OPENAI_BASE_URL || DEFAULT_BASE,
-    apiKey: env.SPUR_API_KEY || env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || '',
+    apiKey: env.SPUR_API_KEY || env.OPENAI_API_KEY || '',
     model: env.SPUR_MODEL || env.MODEL || 'spur-glm-5-2',
     // Verified against GET /v1/models. The id in SPUR's welcome email
     // ("Google Gemma 4 31B") is a display name and 404s if sent as a model id.
