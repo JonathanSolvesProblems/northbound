@@ -15,7 +15,7 @@ import { ROADSTAR_BASE } from '../legal/geo';
 import { loadHistory, repeatedLanes, ATRI_COST_PER_MILE_2025 } from '../analysis/history';
 
 const HISTORY = new URL('../../data/raw/sheets/dispatch.csv', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
-const DATA = new URL('../../data/raw/drivers.csv', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+const DATA = new URL('../../data/raw/sheets/driver.csv', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
 
 /** One shift's worth of driving under the tighter of the two rulebooks. */
 const SHIFT_DRIVING_HOURS = 11;
