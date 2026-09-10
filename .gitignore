@@ -1,0 +1,32 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+*.log
+*.tsbuildinfo
+
+# Secrets
+.env
+.env.local
+.env*.local
+
+# Organizer-provided freight records. Real carrier data, keep it out of a public repo.
+data/raw/
+data/private/
+*.duckdb
+*.sqlite
+*.db
+
+# Python
+__pycache__/
+*.pyc
+
+# GeoNames dumps. Rebuild with scripts/build_gazetteer.py rather than committing 80 MB.
+# gazetteer.json IS committed so a clean clone runs without a download.
+data/ref/*.zip
+data/ref/admin1*.txt
+
+# OS
+.DS_Store
+Thumbs.db
