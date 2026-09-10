@@ -8,6 +8,7 @@ text is exactly what the command printed.
     python scripts/broll.py            # all shots
     python scripts/broll.py 05 06      # just these
     python scripts/broll.py --replay   # re-record from the captured .txt, no re-running
+    python scripts/broll.py --page     # record the deployed project page, scrolling
 
 Output: broll/NN-name.mp4 (1920x1080, CRF 18) plus broll/NN-name.png (last frame)
 and broll/NN-name.txt (the raw captured output, for the record).
@@ -126,6 +127,54 @@ async function run(){
 run();
 </script></body></html>'''
 
+# ------------------------------------------------------------------ page shots
+# The project page is b-roll too. Recorded from the deployed URL, so what the
+# video shows is exactly what a judge opens.
+PAGE_URL = 'https://jonathansolvesproblems.github.io/northbound/'
+PAGE_SHOTS = [
+    dict(id='00-page-hero',     hold=5,  scroll_to=None),
+    dict(id='00-page-scroll',   hold=2,  scroll_to='section.sign:nth-of-type(3)', glide=9),
+    dict(id='00-page-headline', hold=6,  scroll_to='section.sign:nth-of-type(3)'),
+    dict(id='00-page-verdicts', hold=6,  scroll_to='#verdicts', media=True),
+    dict(id='00-page-close',    hold=5,  scroll_to='footer'),
+]
+
+
+def record_page(shot):
+    from playwright.sync_api import sync_playwright
+    vid_dir = BROLL / '_rec'; vid_dir.mkdir(exist_ok=True)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        ctx = browser.new_context(viewport={'width': W, 'height': H}, color_scheme='dark',
+                                  record_video_dir=str(vid_dir), record_video_size={'width': W, 'height': H})
+        page = ctx.new_page()
+        # networkidle waits on 11 MB of looping media; fonts are what the frame needs.
+        page.goto(PAGE_URL, wait_until='domcontentloaded')
+        page.evaluate('document.fonts.ready')
+        page.wait_for_timeout(900)
+        if shot.get('media'):
+            page.wait_for_function("[...document.querySelectorAll('video')].every(v=>v.readyState>=2)", timeout=40_000)
+        if shot.get('glide'):
+            # a slow human scroll from the top to the target, then rest
+            target_y = page.evaluate(f"document.querySelector('{shot['scroll_to']}').getBoundingClientRect().top + window.scrollY - 24")
+            steps = int(shot['glide'] * 60)
+            for i in range(1, steps + 1):
+                k = i / steps; e = 1 - (1 - k) ** 3
+                page.evaluate(f"window.scrollTo(0, {target_y} * {e})")
+                page.wait_for_timeout(16)
+        elif shot.get('scroll_to'):
+            page.evaluate(f"document.querySelector('{shot['scroll_to']}').scrollIntoView({{block:'start', behavior:'smooth'}})")
+            page.wait_for_timeout(1400)
+        page.wait_for_timeout(int(shot['hold'] * 1000))
+        page.screenshot(path=str(BROLL / f'{shot["id"]}.png'))
+        video = page.video; ctx.close(); webm = Path(video.path()); browser.close()
+    mp4 = BROLL / f'{shot["id"]}.mp4'
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(webm), '-vf', f'scale={W}:{H}:flags=lanczos,format=yuv420p',
+                    '-r', '30', '-c:v', 'libx264', '-preset', 'fast', '-crf', '18', '-movflags', '+faststart', str(mp4)], check=True)
+    webm.unlink(missing_ok=True)
+    return mp4
+
+
 ANSI = re.compile(r'\x1b\[[0-9;]*[A-Za-z]')
 
 
@@ -198,8 +247,19 @@ def main():
     args = sys.argv[1:]
     replay = '--replay' in args
     want = set(a for a in args if not a.startswith('--'))
-    chosen = [s for s in SHOTS if not want or any(s['id'].startswith(w) for w in want)]
     results = []
+    if '--page' in args or any(w.startswith('00') for w in want):
+        for shot in PAGE_SHOTS:
+            if want and not any(shot['id'].startswith(w) for w in want) and '--page' not in args:
+                continue
+            print(f'\n[{shot["id"]}] recording the live page')
+            mp4 = record_page(shot)
+            results.append((shot['id'], probe(mp4)))
+            print(f'   -> {mp4.name}  {results[-1][1]}')
+    if '--page' in args and not want:
+        chosen = []
+    else:
+        chosen = [s for s in SHOTS if not want or any(s['id'].startswith(w) for w in want)]
     for shot in chosen:
         lines, code = capture(shot, replay=replay)
         if not lines:
