@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northbound</title>
+<meta name="description" content="A load board that knows which US freight a Canadian truck is legally allowed to haul. Built on Roadstar Trucking's dispatch history for the RoadStar Hackathon 2026.">
+<meta property="og:title" content="Northbound">
+<meta property="og:description" content="Your truck already drove that lane. Empty. Northbound finds the freight it could legally have carried.">
+<meta property="og:image" content="https://jonathansolvesproblems.github.io/northbound/media/03-the-rule.png">
+<style>
+:root{
+  --bg:#12161c;--panel:#181d25;--line:#2a313c;--text:#d6dbe3;--bright:#e6edf3;--muted:#8b949e;
+  --amber:#ffd166;--green:#7ee787;--red:#ff7b72;--blue:#7aa2f7;
+  --mono:"Cascadia Code","Consolas","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 var(--sans)}
+a{color:var(--amber);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+header{padding:88px 0 56px;border-bottom:1px solid var(--line)}
+.kicker{font:14px var(--mono);color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+h1{font-size:clamp(44px,8vw,84px);line-height:.95;margin:0 0 22px;color:var(--bright);letter-spacing:-.02em;font-weight:800}
+.tag{font-size:clamp(20px,2.6vw,27px);line-height:1.35;color:var(--text);max-width:820px;margin:0 0 30px}
+.tag b{color:var(--bright)}
+.links a{display:inline-block;font:15px var(--mono);padding:10px 16px;border:1px solid var(--line);border-radius:6px;margin:0 10px 10px 0;color:var(--bright)}
+.links a.pri{background:var(--amber);color:#1a1400;border-color:var(--amber);font-weight:600}
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+h2{font-size:32px;line-height:1.15;margin:0 0 10px;color:var(--bright);letter-spacing:-.01em}
+.lede{font-size:19px;color:var(--muted);margin:0 0 28px;max-width:760px}
+p{max-width:760px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px}
+.num{font:700 46px/1 var(--mono);color:var(--amber);margin:0 0 6px}
+.num.g{color:var(--green)}.num.r{color:var(--red)}.num.b{color:var(--blue)}
+.lbl{color:var(--muted);font-size:15px}
+table{border-collapse:collapse;width:100%;font:15px var(--mono);margin:18px 0}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:500}
+td.n{text-align:right;color:var(--bright)}th.n{text-align:right}
+tr.hot td{color:var(--amber);font-weight:600}
+blockquote{margin:22px 0;padding:18px 22px;border-left:3px solid var(--amber);background:var(--panel);border-radius:0 8px 8px 0;color:var(--bright);font-size:18px}
+blockquote small{display:block;margin-top:8px;color:var(--muted);font:14px var(--mono)}
+.term{background:#0f1319;border:1px solid var(--line);border-radius:10px;padding:18px 22px;font:14.5px/1.5 var(--mono);color:var(--text);overflow-x:auto;white-space:pre}
+.term .a{color:var(--amber)}.term .r{color:var(--red)}.term .g{color:var(--green)}.term .m{color:var(--muted)}
+figure{margin:26px 0}
+figure video,figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#000}
+figcaption{font:14px var(--mono);color:var(--muted);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+.verdict{font:700 15px var(--mono);padding:3px 9px;border-radius:5px;display:inline-block;margin-right:8px}
+.v-g{background:#1d3a26;color:var(--green)}.v-a{background:#3d3010;color:var(--amber)}.v-r{background:#3f1d1b;color:var(--red)}
+ul{padding-left:22px}li{margin:6px 0}
+footer{padding:48px 0 72px;color:var(--muted);font-size:15px}
+footer .row{display:flex;flex-wrap:wrap;gap:22px;align-items:center}
+.sources{font:14px var(--mono);color:var(--muted)}
+.sources td{padding:6px 12px 6px 0;border:0;vertical-align:top}
+.sources td:first-child{color:var(--text);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">RoadStar Hackathon 2026 · built on Roadstar Trucking's dispatch history</div>
+    <h1>Northbound</h1>
+    <p class="tag"><b>Your truck already drove that lane. Empty.</b> Northbound finds the freight it could legally have carried.</p>
+    <div class="links">
+      <a class="pri" href="https://github.com/JonathanSolvesProblems/northbound">Source on GitHub</a>
+      <a href="#verdicts">See a verdict</a>
+      <a href="#ablation">The ablation</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Their data said I was wrong</h2>
+    <p class="lede">I assumed a Canadian carrier's problem is coming home empty from the US Midwest. Roadstar's own completed dispatch history, 10,479 legs over about two months, says otherwise.</p>
+    <table>
+      <tr><th>Where the empty miles are</th><th class="n">Legs</th><th class="n">Miles</th></tr>
+      <tr class="hot"><td>Repositioning inside the US</td><td class="n">778</td><td class="n">126,874</td></tr>
+      <tr><td>Inside Canada</td><td class="n">2,847</td><td class="n">65,738</td></tr>
+      <tr><td>Crossing south empty</td><td class="n">92</td><td class="n">27,979</td></tr>
+      <tr><td>Coming home empty</td><td class="n">6</td><td class="n">2,044</td></tr>
+    </table>
+    <p>Six empty legs home in two months. They are good at loading for home. The empty running is <em>between</em> US loads, and whether any of it could have carried freight is a legal question, not a routing one.</p>
+    <figure><video src="media/02-empty-miles.mp4" muted autoplay loop playsinline></video><figcaption>python scripts/empty_miles.py · real output, recorded</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Cabotage is directional, and almost everyone treats it as binary</h2>
+    <p class="lede">A Canadian truck may not haul US point-to-point freight. Every distance optimiser will offer it anyway. But the regulation is not a flat no.</p>
+    <blockquote>Carriage "in the general direction of an export move or <b>as part of the return of the vehicle to its base country</b> shall be considered incidental to its engagement in international traffic."<small>19 CFR 123.14(c)(1) · verified against Cornell LII and govinfo independently</small></blockquote>
+    <div class="grid">
+      <div class="card"><span class="verdict v-g">GREEN</span> Columbus → Brampton<br><span class="lbl">International. No cabotage question.</span></div>
+      <div class="card"><span class="verdict v-r">RED</span> Columbus → Atlanta<br><span class="lbl">Moving away from home. Local traffic.</span></div>
+      <div class="card"><span class="verdict v-a">AMBER</span> Columbus → Detroit<br><span class="lbl">US domestic, but heading home. Call your broker.</span></div>
+    </div>
+    <p style="margin-top:22px">Amber exists because the driver's B-1 admission is a second, stricter layer than the equipment rule. The two disagree on exactly one commercially interesting case, so Northbound surfaces it with both citations and hands the decision to the carrier's broker. It names the provision. It is not legal advice.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The headline</h2>
+    <div class="grid">
+      <div class="card"><div class="num">217</div><div class="lbl">empty legs already travelling toward the border</div></div>
+      <div class="card"><div class="num">66,702</div><div class="lbl">miles that could legally have carried freight</div></div>
+      <div class="card"><div class="num">$155,815</div><div class="lbl">at ATRI's published 2025 cost of $2.336 / mile</div></div>
+    </div>
+    <p style="margin-top:22px">And it repeats, which is what makes it fixable with standing agreements rather than luck: Fairburn GA → Walton KY ran empty <b>10 times</b>, Morris IL → Richmond IN <b>13</b>, Scottsville KY → Walton KY <b>11</b>.</p>
+    <figure><video src="media/04-headline.mp4" muted autoplay loop playsinline></video><figcaption>python scripts/fillable.py</figcaption></figure>
+    <h2 style="margin-top:40px;font-size:24px">The part I did not expect</h2>
+    <p><b>120 times in two months</b>, a Roadstar truck ran empty toward the border within 150 km and 48 hours of a Roadstar load heading to Ontario.</p>
+    <div class="term">Driver67 ran EMPTY  Fairburn, GA → Washington, IN   (476 mi, Jul 30)
+   while bill 410487 for CSA TRANSPORTATION
+   moved       Atlanta, GA → Etobicoke, ON          (Jul 29)</div>
+    <p>Fairburn is twenty miles from Atlanta. Same company, two trucks, one of them empty and legally able to carry. Every order in the book was hauled, so this is not lost revenue: it is a load assignment that could have gone the other way. The 150 km / 48 h thresholds are mine, so the sensitivity is published rather than a single tuned number; at the most conservative corner, 50 km and 12 hours, it is still 30 legs and $16,000.</p>
+    <figure><img src="media/08-overlap.png" alt="overlap analysis output showing the Fairburn to Atlanta pairing" loading="lazy"><figcaption>python scripts/overlap.py</figcaption></figure>
+  </div>
+</section>
+
+<section id="verdicts">
+  <div class="wrap">
+    <h2>A dispatcher pastes the offer as it arrived</h2>
+    <p class="lede">GLM 5.2 on SPUR reads it. The law decides. A model should never be the thing asserting what a regulation permits.</p>
+    <div class="two">
+      <figure><video src="media/05-offer-amber.mp4" muted autoplay loop playsinline></video><figcaption><span class="verdict v-a">AMBER</span> Fairburn GA → Walton KY, a lane Roadstar ran empty ten times</figcaption></figure>
+      <figure><video src="media/06-offer-red.mp4" muted autoplay loop playsinline></video><figcaption><span class="verdict v-r">RED</span> Columbus → Atlanta, $2,100, and what taking it would cost</figcaption></figure>
+    </div>
+    <div class="term"><span class="r">RED</span>  ·  Not available to this truck.
+   Domestic US move that does not carry the truck toward its base country.
+   The <span class="a">$2,100</span> on offer is not worth it. Taking it is the cabotage violation
+   19 CFR 123.14(d) warns of: liabilities under section 592 of the Tariff Act
+   of 1930, and the driver's B-1 admission at risk on his next entry.</div>
+    <p style="margin-top:18px">A load board that only ever says yes will eventually get a driver turned around at the bridge. Northbound says no, names the provision, and names the exposure.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The clock changes at the bridge</h2>
+    <p class="lede">A driver leaving Milton for Chicago runs under 49 CFR 395.3 south of the border and SOR/2005-313 north of it. Roadstar's own TMS tracks both, in separate columns per driver. 88% of their drivers carry a materially different figure, mean gap 18.3 hours.</p>
+    <div class="term">Driver84   Corunna, MI → Guelph, ON
+  hours    53.4h US cycle, 11.3h Canadian   <span class="r">LOSES 42.1h crossing</span></div>
+    <p style="margin-top:18px">His board says 53 hours. He has 11 the moment he crosses. Border wait is priced live from CBP's public feed, commercial and FAST lanes separately, and because the rule asks for an interruption in driving status rather than off-duty time, a wait over 30 minutes is credited as the break he already owed.</p>
+    <figure><video src="media/07-board.mp4" muted autoplay loop playsinline></video><figcaption>npx tsx src/cli/board.ts · 34 real trucks in the US, live CBP waits</figcaption></figure>
+  </div>
+</section>
+
+<section id="ablation">
+  <div class="wrap">
+    <h2>What the model contributes, measured</h2>
+    <p class="lede">Every entry at a sponsored hackathon says the sponsor's product was essential. This measures it. The same offers are read twice, once by GLM 5.2 and once by a fair rules parser with the model switched off. Ground truth is Roadstar's order book. Both arms see byte-identical text.</p>
+    <table>
+      <tr><th></th><th class="n">GLM 5.2</th><th class="n">no model</th></tr>
+      <tr><td>origin + destination read correctly</td><td class="n">100%</td><td class="n">40%</td></tr>
+      <tr><td>weight</td><td class="n">81%</td><td class="n">61%</td></tr>
+      <tr class="hot"><td>correct legal verdict reached</td><td class="n">100%</td><td class="n">40%</td></tr>
+    </table>
+    <p>The regex arm matches the model on structured formats and fails completely on the three informal ones freight actually arrives in: trader shorthand, chat messages, forwarded chains. n = 100, zero read failures.</p>
+    <figure><video src="media/09-ablation.mp4" muted autoplay loop playsinline></video><figcaption>npx tsx src/cli/ablation.ts</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The prose cannot drift from the data</h2>
+    <p class="lede">A script recomputes every number on this page from the raw sheets and fails the build if the docs disagree, or if a figure this project produced and later retired ever reappears. On its first run it caught four mistakes in my own writeup.</p>
+    <figure><video src="media/10-check-claims.mp4" muted autoplay loop playsinline></video><figcaption>python scripts/check_claims.py</figcaption></figure>
+    <h2 style="margin-top:40px;font-size:24px">Honest limitations</h2>
+    <ul>
+      <li>The window is about two months. Nothing is annualised.</li>
+      <li>98.4% of orders geocode; the 65 that fail are typos in the source data and are reported, not dropped.</li>
+      <li>Distances use haversine with a 1.2 highway circuity factor. Fine for choosing a crossing and a direction. Not used for an invoice.</li>
+      <li>The driver hours-of-service state is built from cycle hours remaining, not a full duty log. Enough to rank a board, not to certify a logbook.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Who graded the numbers</h2>
+    <p class="lede">Not me. That is the point.</p>
+    <table class="sources">
+      <tr><td>Which legs ran, how far, loaded or empty</td><td>Roadstar's own Dispatch sheet</td></tr>
+      <tr><td>Truck positions, dual-clock hours</td><td>Roadstar's own Driver sheet</td></tr>
+      <tr><td>Border wait times</td><td><a href="https://bwt.cbp.gov/api/waittimes">CBP, live</a></td></tr>
+      <tr><td>What counts as heading home</td><td>19 CFR 123.14(c)(1)</td></tr>
+      <tr><td>Hours of service</td><td>49 CFR 395.3 · SOR/2005-313</td></tr>
+      <tr><td>Cost per mile</td><td>ATRI, Operational Costs of Trucking: 2025 Update</td></tr>
+      <tr><td>City coordinates</td><td>GeoNames</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <a href="https://github.com/JonathanSolvesProblems/northbound">github.com/JonathanSolvesProblems/northbound</a>
+      <span>·</span>
+      <a href="https://jonathansolvesproblems.com">jonathansolvesproblems.com</a>
+      <span>·</span>
+      <span>Jonathan Andrei · RoadStar Hackathon 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
