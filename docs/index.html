@@ -7,76 +7,224 @@
 <meta name="description" content="A load board that knows which US freight a Canadian truck is legally allowed to haul. Built on Roadstar Trucking's dispatch history for the RoadStar Hackathon 2026.">
 <meta property="og:title" content="Northbound">
 <meta property="og:description" content="Your truck already drove that lane. Empty. Northbound finds the freight it could legally have carried.">
-<meta property="og:image" content="https://jonathansolvesproblems.github.io/northbound/media/03-the-rule.png">
+<meta property="og:image" content="https://jonathansolvesproblems.github.io/northbound/media/og.png">
+<link rel="icon" href="media/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
+/*
+  DESIGN CODE. Read this before editing, or the next edit drifts back to the default.
+
+  Convention avoided: logistics SaaS blue with a map tile and a truck icon, and the
+  hackathon dark console with an accent colour.
+
+  Metaphor: highway guide signs on a gantry over asphalt. The product is named for a
+  direction, and its three verdicts are the road's own sign colours: green guide
+  (this way), yellow warning diamond (conditions ahead), red regulatory (prohibited).
+  MUTCD taught every driver on the judging panel those three before they had a
+  licence, so the palette was read off the road rather than chosen.
+
+  Type is Overpass, a Highway Gothic descendant, because signs are read at 100 km/h.
+  Figures are tabular because a column of lanes has to line up. No monospace family:
+  terminal captures are shown as screens, they are content, not chrome.
+
+  Depth is sheet metal on a gantry: hard offset shadow with zero blur, a rolled edge,
+  four corner bolts. One motion only: a headlight sweep as a panel enters view,
+  because retroreflective sheeting is the only way a sign has ever moved.
+*/
+
 :root{
-  --bg:#12161c;--panel:#181d25;--line:#2a313c;--text:#d6dbe3;--bright:#e6edf3;--muted:#8b949e;
-  --amber:#ffd166;--green:#7ee787;--red:#ff7b72;--blue:#7aa2f7;
-  --mono:"Cascadia Code","Consolas","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --sans:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  --road:#2E3032; --shoulder:#4A4C4E; --lane:#D9D6CF;
+  --sign:#0A6B3F; --sign-edge:#178A52; --sign-shadow:#061C11; --on-sign:#F4F3EF; --on-sign-dim:#BFE3CF;
+  --warn:#F5C400; --on-warn:#161616; --stop:#B8102E; --on-stop:#F4F3EF;
+  --road-text:#E6E4DF; --road-muted:#A9A7A2;
+  --screen:#111417; --screen-edge:#2A2F35;
+  --type:"Overpass","Segoe UI",system-ui,sans-serif;
+  --base:18px;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --road:#B4B5B2; --shoulder:#CBCCC8; --lane:#F6F5F2;
+    --sign:#0E7A47; --sign-edge:#1C9A5C; --sign-shadow:#083A22; --on-sign:#FFFFFF; --on-sign-dim:#CFEBDB;
+    --warn:#FFCC00; --on-warn:#161616; --stop:#C41230; --on-stop:#FFFFFF;
+    --road-text:#1E1F21; --road-muted:#4E5052;
+  }
 }
 *{box-sizing:border-box}
-html{color-scheme:dark}
-body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 var(--sans)}
-a{color:var(--amber);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
-header{padding:88px 0 56px;border-bottom:1px solid var(--line)}
-.kicker{font:14px var(--mono);color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
-h1{font-size:clamp(44px,8vw,84px);line-height:.95;margin:0 0 22px;color:var(--bright);letter-spacing:-.02em;font-weight:800}
-.tag{font-size:clamp(20px,2.6vw,27px);line-height:1.35;color:var(--text);max-width:820px;margin:0 0 30px}
-.tag b{color:var(--bright)}
-.links a{display:inline-block;font:15px var(--mono);padding:10px 16px;border:1px solid var(--line);border-radius:6px;margin:0 10px 10px 0;color:var(--bright)}
-.links a.pri{background:var(--amber);color:#1a1400;border-color:var(--amber);font-weight:600}
-section{padding:56px 0;border-bottom:1px solid var(--line)}
-h2{font-size:32px;line-height:1.15;margin:0 0 10px;color:var(--bright);letter-spacing:-.01em}
-.lede{font-size:19px;color:var(--muted);margin:0 0 28px;max-width:760px}
-p{max-width:760px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px}
-.num{font:700 46px/1 var(--mono);color:var(--amber);margin:0 0 6px}
-.num.g{color:var(--green)}.num.r{color:var(--red)}.num.b{color:var(--blue)}
-.lbl{color:var(--muted);font-size:15px}
-table{border-collapse:collapse;width:100%;font:15px var(--mono);margin:18px 0}
-th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
-th{color:var(--muted);font-weight:500}
-td.n{text-align:right;color:var(--bright)}th.n{text-align:right}
-tr.hot td{color:var(--amber);font-weight:600}
-blockquote{margin:22px 0;padding:18px 22px;border-left:3px solid var(--amber);background:var(--panel);border-radius:0 8px 8px 0;color:var(--bright);font-size:18px}
-blockquote small{display:block;margin-top:8px;color:var(--muted);font:14px var(--mono)}
-.term{background:#0f1319;border:1px solid var(--line);border-radius:10px;padding:18px 22px;font:14.5px/1.5 var(--mono);color:var(--text);overflow-x:auto;white-space:pre}
-.term .a{color:var(--amber)}.term .r{color:var(--red)}.term .g{color:var(--green)}.term .m{color:var(--muted)}
-figure{margin:26px 0}
-figure video,figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#000}
-figcaption{font:14px var(--mono);color:var(--muted);margin-top:10px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-@media(max-width:820px){.two{grid-template-columns:1fr}}
-.verdict{font:700 15px var(--mono);padding:3px 9px;border-radius:5px;display:inline-block;margin-right:8px}
-.v-g{background:#1d3a26;color:var(--green)}.v-a{background:#3d3010;color:var(--amber)}.v-r{background:#3f1d1b;color:var(--red)}
-ul{padding-left:22px}li{margin:6px 0}
-footer{padding:48px 0 72px;color:var(--muted);font-size:15px}
-footer .row{display:flex;flex-wrap:wrap;gap:22px;align-items:center}
-.sources{font:14px var(--mono);color:var(--muted)}
-.sources td{padding:6px 12px 6px 0;border:0;vertical-align:top}
-.sources td:first-child{color:var(--text);white-space:nowrap}
+html{color-scheme:dark light}
+body{
+  margin:0; font:var(--base)/1.55 var(--type); color:var(--road-text);
+  background-color:var(--road);
+  /* asphalt: fine aggregate, barely there */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  font-variant-numeric:tabular-nums;
+}
+a{color:inherit}
+.road{max-width:1120px;margin:0 auto;padding:0 28px 96px;position:relative}
+/* the shoulder line, full height, left of the signs */
+.road::before{content:"";position:absolute;left:6px;top:0;bottom:0;width:4px;background:var(--lane);opacity:.55}
+@media(max-width:720px){.road::before{display:none}}
+
+/* lane marking between sections: a dashed centre line */
+.lane{height:96px;position:relative}
+.lane::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;
+  background:repeating-linear-gradient(to bottom,var(--lane) 0 28px,transparent 28px 56px);opacity:.75}
+
+/* ---- the sign panel ---- */
+.sign{
+  position:relative; background:var(--sign); color:var(--on-sign);
+  border-radius:10px; padding:44px 48px 48px;
+  box-shadow:0 0 0 1px var(--sign-shadow), 5px 7px 0 0 var(--sign-shadow);
+  /* rolled edge */
+  outline:1px solid var(--sign-edge); outline-offset:-5px;
+  overflow:hidden;
+}
+/* retroreflective bead sheeting */
+.sign::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background-image:radial-gradient(circle,#fff 0 .6px,transparent .7px);background-size:5px 5px}
+/* four corner bolts */
+.sign::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 16px 16px,var(--sign-shadow) 0 3.5px,transparent 4.5px),
+    radial-gradient(circle at calc(100% - 16px) 16px,var(--sign-shadow) 0 3.5px,transparent 4.5px),
+    radial-gradient(circle at 16px calc(100% - 16px),var(--sign-shadow) 0 3.5px,transparent 4.5px),
+    radial-gradient(circle at calc(100% - 16px) calc(100% - 16px),var(--sign-shadow) 0 3.5px,transparent 4.5px)}
+.sign > *{position:relative;z-index:1}
+/* headlight sweep, once, on entry */
+.sign .sweep{position:absolute;inset:-40% -60%;z-index:2;pointer-events:none;opacity:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.22) 50%,transparent 60%);
+  transform:translateX(-70%)}
+.sign.lit .sweep{animation:sweep .75s cubic-bezier(.2,.7,.2,1) 1 forwards}
+@keyframes sweep{0%{opacity:1;transform:translateX(-70%)}100%{opacity:0;transform:translateX(70%)}}
+@media (prefers-reduced-motion: reduce){.sign .sweep{display:none}}
+
+/* exit tab: a small panel riding the top edge */
+.tab{position:absolute;top:-2px;right:36px;z-index:3;background:var(--sign);color:var(--on-sign);
+  font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;
+  padding:8px 14px 6px;border-radius:0 0 8px 8px;
+  box-shadow:0 0 0 1px var(--sign-shadow),4px 5px 0 0 var(--sign-shadow)}
+.tab.y{background:var(--warn);color:var(--on-warn)}
+.tab.y::before{content:"EXIT ";opacity:.7}
+
+/* type on the sign */
+.sign h1,.sign h2{font-weight:800;letter-spacing:-.01em;line-height:1.02;margin:0 0 14px;text-transform:uppercase}
+.sign h1{font-size:clamp(56px,9.6vw,116px);letter-spacing:-.025em;margin-bottom:10px;white-space:nowrap}
+.sign h2{font-size:clamp(30px,4.4vw,46px)}
+.sign p{max-width:62ch;margin:0 0 16px;font-size:19px;color:var(--on-sign)}
+.sign p.dim,.sign .dim{color:var(--on-sign-dim)}
+.sign p.lede{font-size:22px;line-height:1.4;font-weight:500;max-width:56ch}
+.sign b,.sign strong{color:#fff;font-weight:700}
+.sign em{font-style:italic}
+.sign a:not(.route){color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px}
+
+/* destinations: the way a guide sign lists places with distances */
+.dest{margin:22px 0 6px;display:grid;grid-template-columns:auto 1fr;column-gap:26px;row-gap:6px;align-items:baseline}
+.dest .n{font-size:clamp(44px,6.5vw,80px);font-weight:800;line-height:1;letter-spacing:-.03em;text-align:right;color:#fff}
+.dest .l{font-size:20px;line-height:1.3;color:var(--on-sign);padding-bottom:6px;border-bottom:2px solid rgba(255,255,255,.18)}
+.dest .l:last-child{border-bottom:0}
+
+/* tables on a sign */
+table{border-collapse:collapse;width:100%;margin:18px 0 8px;font-size:18px}
+th,td{text-align:left;padding:11px 8px;border-bottom:2px solid rgba(255,255,255,.16)}
+th{font-weight:500;color:var(--on-sign-dim);font-size:15px;text-transform:uppercase;letter-spacing:.05em}
+td.n,th.n{text-align:right}
+td.n{font-weight:700;color:#fff}
+tr.hot td{color:var(--warn)}tr.hot td.n{color:var(--warn)}
+
+/* the arrow */
+.arrow{display:inline-block;width:.9em;height:.9em;vertical-align:-.08em;margin-left:.15em}
+.hero .arrow{width:.72em;height:.72em;margin-left:.06em;vertical-align:-.02em}
+
+/* sign-style links, no pills */
+.routes{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.route{display:inline-flex;align-items:center;gap:10px;background:var(--on-sign);color:var(--sign);text-decoration:none!important;
+  font-weight:800;font-size:16px;letter-spacing:.03em;text-transform:uppercase;padding:12px 18px 10px;border-radius:6px;
+  box-shadow:0 0 0 1px var(--sign-shadow),3px 4px 0 0 var(--sign-shadow)}
+.route.y{background:var(--warn);color:var(--on-warn)}
+.route:hover{transform:translate(1px,1px);box-shadow:0 0 0 1px var(--sign-shadow),2px 3px 0 0 var(--sign-shadow)}
+.route:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+
+/* ---- verdict signs ---- */
+.verdicts{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:30px 0 10px;align-items:start}
+@media(max-width:820px){.verdicts{grid-template-columns:1fr}}
+.v{display:grid;grid-template-columns:96px 1fr;gap:18px;align-items:center}
+.v .shape{width:96px;height:96px;position:relative;flex:none}
+.v .shape svg{width:100%;height:100%;display:block;filter:drop-shadow(3px 4px 0 var(--sign-shadow))}
+.v .lbl{font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:15px;margin-bottom:4px}
+.v .lbl.g{color:#fff}.v .lbl.y{color:var(--warn)}.v .lbl.r{color:#FF8A9A}
+.v .t{font-size:18px;line-height:1.35}
+.v .t small{display:block;color:var(--on-sign-dim);font-size:15px;margin-top:2px}
+
+/* ---- screens: the software, mounted on the gantry ---- */
+figure{margin:28px 0 6px}
+figure video,figure img{width:100%;display:block;background:#000;border-radius:6px}
+.screen{background:var(--screen);padding:10px;border-radius:9px;
+  box-shadow:0 0 0 1px var(--screen-edge),4px 5px 0 0 var(--sign-shadow)}
+figcaption{margin-top:12px;font-size:15px;color:var(--on-sign-dim)}
+figcaption b{color:#fff;font-weight:700}
+.two{display:grid;grid-template-columns:1fr;gap:22px}
+
+/* the one place terminal text appears as text: an excerpt from a screen, not a design font */
+.excerpt{background:var(--screen);color:#D6DBE3;border-radius:6px;padding:16px 20px;margin:18px 0;
+  font:15px/1.5 ui-monospace,Consolas,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;
+  box-shadow:0 0 0 1px var(--screen-edge)}
+.excerpt .y{color:var(--warn)}.excerpt .r{color:#FF7B72}.excerpt .g{color:#7EE787}
+
+ul{padding-left:22px;margin:0}li{margin:8px 0;max-width:62ch}
+
+/* sources: sign lines */
+.src{display:grid;grid-template-columns:auto 1fr;column-gap:28px;row-gap:0}
+.src div{padding:10px 0;border-bottom:2px solid rgba(255,255,255,.16)}
+.src div:nth-last-child(-n+2){border-bottom:0}
+.src .k{color:var(--on-sign-dim);font-size:16px}
+
+footer{margin-top:80px;display:flex;flex-wrap:wrap;gap:18px 30px;align-items:center;color:var(--road-muted);font-size:16px}
+footer .shield{width:44px;height:50px;flex:none}
+footer a{color:var(--road-text);text-decoration:none;border-bottom:2px solid var(--shoulder)}
+footer a:hover{border-color:var(--lane)}
+
+@media(max-width:720px){
+  .sign{padding:30px 22px 34px}
+  .tab{right:18px}
+  .dest{grid-template-columns:1fr;row-gap:2px}
+  .dest .n{text-align:left}
+  .v{grid-template-columns:72px 1fr}.v .shape{width:72px;height:72px}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap">
-    <div class="kicker">RoadStar Hackathon 2026 · built on Roadstar Trucking's dispatch history</div>
-    <h1>Northbound</h1>
-    <p class="tag"><b>Your truck already drove that lane. Empty.</b> Northbound finds the freight it could legally have carried.</p>
-    <div class="links">
-      <a class="pri" href="https://github.com/JonathanSolvesProblems/northbound">Source on GitHub</a>
-      <a href="#verdicts">See a verdict</a>
-      <a href="#ablation">The ablation</a>
-    </div>
-  </div>
-</header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="up" viewBox="0 0 100 100"><path fill="currentColor" d="M50 4 L92 52 L66 52 L66 96 L34 96 L34 52 L8 52 Z"/></symbol>
+    <symbol id="guide" viewBox="0 0 100 100"><rect x="3" y="3" width="94" height="94" rx="9" fill="#0A6B3F" stroke="#F4F3EF" stroke-width="5"/><path fill="#F4F3EF" d="M50 18 L78 52 L60 52 L60 82 L40 82 L40 52 L22 52 Z"/></symbol>
+    <symbol id="warn" viewBox="0 0 100 100"><path d="M50 3 L97 50 L50 97 L3 50 Z" fill="#F5C400" stroke="#161616" stroke-width="5"/><path d="M50 26 L50 58" stroke="#161616" stroke-width="11" stroke-linecap="round"/><circle cx="50" cy="74" r="6" fill="#161616"/></symbol>
+    <symbol id="stop" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#B8102E" stroke="#F4F3EF" stroke-width="5"/><rect x="22" y="42" width="56" height="16" rx="2" fill="#F4F3EF"/></symbol>
+  </defs>
+</svg>
 
-<section>
-  <div class="wrap">
+<main class="road">
+
+  <!-- 0. overhead guide sign -->
+  <header class="sign hero" style="margin-top:56px">
+    <span class="sweep"></span>
+    <span class="tab">RoadStar Hackathon 2026</span>
+    <h1>Northbound<svg class="arrow" aria-hidden="true"><use href="#up"/></svg></h1>
+    <p class="lede"><b>Your truck already drove that lane. Empty.</b> Northbound finds the freight it could legally have carried.</p>
+    <p class="dim">A load board that knows which US freight a Canadian truck is allowed to haul. Built on Roadstar Trucking's own dispatch history.</p>
+    <div class="routes">
+      <a class="route" href="https://github.com/JonathanSolvesProblems/northbound">Source on GitHub</a>
+      <a class="route y" href="#verdicts">See a verdict</a>
+      <a class="route" href="#ablation">The ablation</a>
+    </div>
+  </header>
+
+  <div class="lane"></div>
+
+  <!-- 1 -->
+  <section class="sign">
+    <span class="sweep"></span><span class="tab y">1</span>
     <h2>Their data said I was wrong</h2>
     <p class="lede">I assumed a Canadian carrier's problem is coming home empty from the US Midwest. Roadstar's own completed dispatch history, 10,479 legs over about two months, says otherwise.</p>
     <table>
@@ -87,129 +235,148 @@ footer .row{display:flex;flex-wrap:wrap;gap:22px;align-items:center}
       <tr><td>Coming home empty</td><td class="n">6</td><td class="n">2,044</td></tr>
     </table>
     <p>Six empty legs home in two months. They are good at loading for home. The empty running is <em>between</em> US loads, and whether any of it could have carried freight is a legal question, not a routing one.</p>
-    <figure><video src="media/02-empty-miles.mp4" muted autoplay loop playsinline></video><figcaption>python scripts/empty_miles.py · real output, recorded</figcaption></figure>
-  </div>
-</section>
+    <figure class="screen"><video src="media/02-empty-miles.mp4" muted autoplay loop playsinline></video><figcaption><b>python scripts/empty_miles.py</b> · real output, recorded</figcaption></figure>
+  </section>
 
-<section>
-  <div class="wrap">
-    <h2>Cabotage is directional, and almost everyone treats it as binary</h2>
+  <div class="lane"></div>
+
+  <!-- 2 -->
+  <section class="sign">
+    <span class="sweep"></span><span class="tab y">2</span>
+    <h2>The rule is directional</h2>
     <p class="lede">A Canadian truck may not haul US point-to-point freight. Every distance optimiser will offer it anyway. But the regulation is not a flat no.</p>
-    <blockquote>Carriage "in the general direction of an export move or <b>as part of the return of the vehicle to its base country</b> shall be considered incidental to its engagement in international traffic."<small>19 CFR 123.14(c)(1) · verified against Cornell LII and govinfo independently</small></blockquote>
-    <div class="grid">
-      <div class="card"><span class="verdict v-g">GREEN</span> Columbus → Brampton<br><span class="lbl">International. No cabotage question.</span></div>
-      <div class="card"><span class="verdict v-r">RED</span> Columbus → Atlanta<br><span class="lbl">Moving away from home. Local traffic.</span></div>
-      <div class="card"><span class="verdict v-a">AMBER</span> Columbus → Detroit<br><span class="lbl">US domestic, but heading home. Call your broker.</span></div>
+    <p>19 CFR 123.14(c)(1): carriage "in the general direction of an export move or <b>as part of the return of the vehicle to its base country</b> shall be considered incidental to its engagement in international traffic."<br><span class="dim">Verified against Cornell LII and govinfo independently.</span></p>
+    <div class="verdicts">
+      <div class="v"><div class="shape"><svg><use href="#guide"/></svg></div><div><div class="lbl g">Green</div><div class="t">Columbus → Brampton<small>International. No cabotage question.</small></div></div></div>
+      <div class="v"><div class="shape"><svg><use href="#warn"/></svg></div><div><div class="lbl y">Amber</div><div class="t">Columbus → Detroit<small>US domestic, but heading home. Call your broker.</small></div></div></div>
+      <div class="v"><div class="shape"><svg><use href="#stop"/></svg></div><div><div class="lbl r">Red</div><div class="t">Columbus → Atlanta<small>Moving away from home. Local traffic.</small></div></div></div>
     </div>
     <p style="margin-top:22px">Amber exists because the driver's B-1 admission is a second, stricter layer than the equipment rule. The two disagree on exactly one commercially interesting case, so Northbound surfaces it with both citations and hands the decision to the carrier's broker. It names the provision. It is not legal advice.</p>
-  </div>
-</section>
+  </section>
 
-<section>
-  <div class="wrap">
+  <div class="lane"></div>
+
+  <!-- 3 -->
+  <section class="sign">
+    <span class="sweep"></span><span class="tab y">3</span>
     <h2>The headline</h2>
-    <div class="grid">
-      <div class="card"><div class="num">217</div><div class="lbl">empty legs already travelling toward the border</div></div>
-      <div class="card"><div class="num">66,702</div><div class="lbl">miles that could legally have carried freight</div></div>
-      <div class="card"><div class="num">$155,815</div><div class="lbl">at ATRI's published 2025 cost of $2.336 / mile</div></div>
+    <div class="dest">
+      <div class="n">217</div><div class="l">empty legs already travelling toward the border</div>
+      <div class="n">66,702</div><div class="l">miles that could legally have carried freight</div>
+      <div class="n">$155,815</div><div class="l">at ATRI's published 2025 cost of $2.336 per mile</div>
     </div>
     <p style="margin-top:22px">And it repeats, which is what makes it fixable with standing agreements rather than luck: Fairburn GA → Walton KY ran empty <b>10 times</b>, Morris IL → Richmond IN <b>13</b>, Scottsville KY → Walton KY <b>11</b>.</p>
-    <figure><video src="media/04-headline.mp4" muted autoplay loop playsinline></video><figcaption>python scripts/fillable.py</figcaption></figure>
-    <h2 style="margin-top:40px;font-size:24px">The part I did not expect</h2>
+    <figure class="screen"><video src="media/04-headline.mp4" muted autoplay loop playsinline></video><figcaption><b>python scripts/fillable.py</b></figcaption></figure>
+    <h2 style="margin-top:44px;font-size:clamp(24px,3vw,32px)">The part I did not expect</h2>
     <p><b>120 times in two months</b>, a Roadstar truck ran empty toward the border within 150 km and 48 hours of a Roadstar load heading to Ontario.</p>
-    <div class="term">Driver67 ran EMPTY  Fairburn, GA → Washington, IN   (476 mi, Jul 30)
+    <div class="excerpt">Driver67 ran EMPTY  Fairburn, GA → Washington, IN   (476 mi, Jul 30)
    while bill 410487 for CSA TRANSPORTATION
    moved       Atlanta, GA → Etobicoke, ON          (Jul 29)</div>
     <p>Fairburn is twenty miles from Atlanta. Same company, two trucks, one of them empty and legally able to carry. Every order in the book was hauled, so this is not lost revenue: it is a load assignment that could have gone the other way. The 150 km / 48 h thresholds are mine, so the sensitivity is published rather than a single tuned number; at the most conservative corner, 50 km and 12 hours, it is still 30 legs and $16,000.</p>
-    <figure><img src="media/08-overlap.png" alt="overlap analysis output showing the Fairburn to Atlanta pairing" loading="lazy"><figcaption>python scripts/overlap.py</figcaption></figure>
-  </div>
-</section>
+    <figure class="screen"><img src="media/08-overlap.png" alt="overlap analysis output showing the Fairburn to Atlanta pairing" loading="lazy"><figcaption><b>python scripts/overlap.py</b></figcaption></figure>
+  </section>
 
-<section id="verdicts">
-  <div class="wrap">
-    <h2>A dispatcher pastes the offer as it arrived</h2>
+  <div class="lane"></div>
+
+  <!-- 4 -->
+  <section class="sign" id="verdicts">
+    <span class="sweep"></span><span class="tab y">4</span>
+    <h2>Paste the offer as it arrived</h2>
     <p class="lede">GLM 5.2 on SPUR reads it. The law decides. A model should never be the thing asserting what a regulation permits.</p>
     <div class="two">
-      <figure><video src="media/05-offer-amber.mp4" muted autoplay loop playsinline></video><figcaption><span class="verdict v-a">AMBER</span> Fairburn GA → Walton KY, a lane Roadstar ran empty ten times</figcaption></figure>
-      <figure><video src="media/06-offer-red.mp4" muted autoplay loop playsinline></video><figcaption><span class="verdict v-r">RED</span> Columbus → Atlanta, $2,100, and what taking it would cost</figcaption></figure>
+      <figure class="screen"><video src="media/05-offer-amber.mp4" muted autoplay loop playsinline></video><figcaption><b>Amber.</b> Fairburn GA → Walton KY, a lane Roadstar ran empty ten times</figcaption></figure>
+      <figure class="screen"><video src="media/06-offer-red.mp4" muted autoplay loop playsinline></video><figcaption><b>Red.</b> Columbus → Atlanta, $2,100, and what taking it would cost</figcaption></figure>
     </div>
-    <div class="term"><span class="r">RED</span>  ·  Not available to this truck.
+    <div class="excerpt"><span class="r">RED</span>  ·  Not available to this truck.
    Domestic US move that does not carry the truck toward its base country.
-   The <span class="a">$2,100</span> on offer is not worth it. Taking it is the cabotage violation
+   The <span class="y">$2,100</span> on offer is not worth it. Taking it is the cabotage violation
    19 CFR 123.14(d) warns of: liabilities under section 592 of the Tariff Act
    of 1930, and the driver's B-1 admission at risk on his next entry.</div>
-    <p style="margin-top:18px">A load board that only ever says yes will eventually get a driver turned around at the bridge. Northbound says no, names the provision, and names the exposure.</p>
-  </div>
-</section>
+    <p>A load board that only ever says yes will eventually get a driver turned around at the bridge. Northbound says no, names the provision, and names the exposure.</p>
+  </section>
 
-<section>
-  <div class="wrap">
+  <div class="lane"></div>
+
+  <!-- 5 -->
+  <section class="sign">
+    <span class="sweep"></span><span class="tab y">5</span>
     <h2>The clock changes at the bridge</h2>
     <p class="lede">A driver leaving Milton for Chicago runs under 49 CFR 395.3 south of the border and SOR/2005-313 north of it. Roadstar's own TMS tracks both, in separate columns per driver. 88% of their drivers carry a materially different figure, mean gap 18.3 hours.</p>
-    <div class="term">Driver84   Corunna, MI → Guelph, ON
+    <div class="excerpt">Driver84   Corunna, MI → Guelph, ON
   hours    53.4h US cycle, 11.3h Canadian   <span class="r">LOSES 42.1h crossing</span></div>
-    <p style="margin-top:18px">His board says 53 hours. He has 11 the moment he crosses. Border wait is priced live from CBP's public feed, commercial and FAST lanes separately, and because the rule asks for an interruption in driving status rather than off-duty time, a wait over 30 minutes is credited as the break he already owed.</p>
-    <figure><video src="media/07-board.mp4" muted autoplay loop playsinline></video><figcaption>npx tsx src/cli/board.ts · 34 real trucks in the US, live CBP waits</figcaption></figure>
-  </div>
-</section>
+    <p>His board says 53 hours. He has 11 the moment he crosses. Border wait is priced live from CBP's public feed, commercial and FAST lanes separately, and because the rule asks for an interruption in driving status rather than off-duty time, a wait over 30 minutes is credited as the break he already owed.</p>
+    <figure class="screen"><video src="media/07-board.mp4" muted autoplay loop playsinline></video><figcaption><b>npx tsx src/cli/board.ts</b> · 34 real trucks in the US, live CBP waits</figcaption></figure>
+  </section>
 
-<section id="ablation">
-  <div class="wrap">
+  <div class="lane"></div>
+
+  <!-- 6 -->
+  <section class="sign" id="ablation">
+    <span class="sweep"></span><span class="tab y">6</span>
     <h2>What the model contributes, measured</h2>
     <p class="lede">Every entry at a sponsored hackathon says the sponsor's product was essential. This measures it. The same offers are read twice, once by GLM 5.2 and once by a fair rules parser with the model switched off. Ground truth is Roadstar's order book. Both arms see byte-identical text.</p>
     <table>
-      <tr><th></th><th class="n">GLM 5.2</th><th class="n">no model</th></tr>
-      <tr><td>origin + destination read correctly</td><td class="n">100%</td><td class="n">40%</td></tr>
-      <tr><td>weight</td><td class="n">81%</td><td class="n">61%</td></tr>
-      <tr class="hot"><td>correct legal verdict reached</td><td class="n">100%</td><td class="n">40%</td></tr>
+      <tr><th></th><th class="n">GLM 5.2</th><th class="n">No model</th></tr>
+      <tr><td>Origin and destination read correctly</td><td class="n">100%</td><td class="n">40%</td></tr>
+      <tr><td>Weight</td><td class="n">81%</td><td class="n">61%</td></tr>
+      <tr class="hot"><td>Correct legal verdict reached</td><td class="n">100%</td><td class="n">40%</td></tr>
     </table>
     <p>The regex arm matches the model on structured formats and fails completely on the three informal ones freight actually arrives in: trader shorthand, chat messages, forwarded chains. n = 100, zero read failures.</p>
-    <figure><video src="media/09-ablation.mp4" muted autoplay loop playsinline></video><figcaption>npx tsx src/cli/ablation.ts</figcaption></figure>
-  </div>
-</section>
+    <figure class="screen"><video src="media/09-ablation.mp4" muted autoplay loop playsinline></video><figcaption><b>npx tsx src/cli/ablation.ts</b></figcaption></figure>
+  </section>
 
-<section>
-  <div class="wrap">
+  <div class="lane"></div>
+
+  <!-- 7 -->
+  <section class="sign">
+    <span class="sweep"></span><span class="tab y">7</span>
     <h2>The prose cannot drift from the data</h2>
     <p class="lede">A script recomputes every number on this page from the raw sheets and fails the build if the docs disagree, or if a figure this project produced and later retired ever reappears. On its first run it caught four mistakes in my own writeup.</p>
-    <figure><video src="media/10-check-claims.mp4" muted autoplay loop playsinline></video><figcaption>python scripts/check_claims.py</figcaption></figure>
-    <h2 style="margin-top:40px;font-size:24px">Honest limitations</h2>
+    <figure class="screen"><video src="media/10-check-claims.mp4" muted autoplay loop playsinline></video><figcaption><b>python scripts/check_claims.py</b></figcaption></figure>
+    <h2 style="margin-top:44px;font-size:clamp(24px,3vw,32px)">Honest limitations</h2>
     <ul>
       <li>The window is about two months. Nothing is annualised.</li>
       <li>98.4% of orders geocode; the 65 that fail are typos in the source data and are reported, not dropped.</li>
       <li>Distances use haversine with a 1.2 highway circuity factor. Fine for choosing a crossing and a direction. Not used for an invoice.</li>
       <li>The driver hours-of-service state is built from cycle hours remaining, not a full duty log. Enough to rank a board, not to certify a logbook.</li>
     </ul>
-  </div>
-</section>
+  </section>
 
-<section>
-  <div class="wrap">
+  <div class="lane"></div>
+
+  <!-- 8 -->
+  <section class="sign">
+    <span class="sweep"></span><span class="tab y">8</span>
     <h2>Who graded the numbers</h2>
     <p class="lede">Not me. That is the point.</p>
-    <table class="sources">
-      <tr><td>Which legs ran, how far, loaded or empty</td><td>Roadstar's own Dispatch sheet</td></tr>
-      <tr><td>Truck positions, dual-clock hours</td><td>Roadstar's own Driver sheet</td></tr>
-      <tr><td>Border wait times</td><td><a href="https://bwt.cbp.gov/api/waittimes">CBP, live</a></td></tr>
-      <tr><td>What counts as heading home</td><td>19 CFR 123.14(c)(1)</td></tr>
-      <tr><td>Hours of service</td><td>49 CFR 395.3 · SOR/2005-313</td></tr>
-      <tr><td>Cost per mile</td><td>ATRI, Operational Costs of Trucking: 2025 Update</td></tr>
-      <tr><td>City coordinates</td><td>GeoNames</td></tr>
-    </table>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="row">
-      <a href="https://github.com/JonathanSolvesProblems/northbound">github.com/JonathanSolvesProblems/northbound</a>
-      <span>·</span>
-      <a href="https://jonathansolvesproblems.com">jonathansolvesproblems.com</a>
-      <span>·</span>
-      <span>Jonathan Andrei · RoadStar Hackathon 2026</span>
+    <div class="src">
+      <div class="k">Which legs ran, how far, loaded or empty</div><div>Roadstar's own Dispatch sheet</div>
+      <div class="k">Truck positions, dual-clock hours</div><div>Roadstar's own Driver sheet</div>
+      <div class="k">Border wait times</div><div><a href="https://bwt.cbp.gov/api/waittimes">CBP, live</a></div>
+      <div class="k">What counts as heading home</div><div>19 CFR 123.14(c)(1)</div>
+      <div class="k">Hours of service</div><div>49 CFR 395.3 · SOR/2005-313</div>
+      <div class="k">Cost per mile</div><div>ATRI, Operational Costs of Trucking: 2025 Update</div>
+      <div class="k">City coordinates</div><div>GeoNames</div>
     </div>
-  </div>
-</footer>
+  </section>
 
+  <footer>
+    <svg class="shield" viewBox="0 0 44 50" aria-hidden="true"><path d="M2 2 H42 V30 Q42 44 22 48 Q2 44 2 30 Z" fill="none" stroke="currentColor" stroke-width="3"/><text x="22" y="33" text-anchor="middle" font-family="Overpass,sans-serif" font-weight="800" font-size="24" fill="currentColor">N</text></svg>
+    <a href="https://github.com/JonathanSolvesProblems/northbound">github.com/JonathanSolvesProblems/northbound</a>
+    <a href="https://jonathansolvesproblems.com">jonathansolvesproblems.com</a>
+    <span>Jonathan Andrei · RoadStar Hackathon 2026</span>
+  </footer>
+
+</main>
+
+<script>
+  // Headlight sweep: once per panel, as it enters view. Nothing else moves.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('lit'); io.unobserve(e.target); }
+    }, { threshold: 0.35 });
+    document.querySelectorAll('.sign').forEach((s) => io.observe(s));
+  }
+</script>
 </body>
 </html>

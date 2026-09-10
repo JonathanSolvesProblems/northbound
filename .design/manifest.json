@@ -1,0 +1,53 @@
+{
+  "project": "northbound",
+  "date": "2026-09-10",
+  "platform": "web-marketing",
+  "family": "mechanical-industrial",
+  "metaphor": "highway guide signs on a gantry over asphalt: the product is named for a direction, and its three verdicts are the sign colours every driver already knows",
+  "category_convention_avoided": "logistics SaaS blue with a map tile and a truck icon; hackathon dark-mode console with an accent",
+  "design_code": [
+    "Content sits on green sheet-metal sign panels with white Highway-Gothic-descended type, because the product is named for a highway direction and it is read the way a sign is read: fast, from a distance, by someone who has somewhere to be.",
+    "Verdicts are the road's own signs: a green guide panel with an arrow, a yellow warning diamond, a red regulatory prohibition, because MUTCD taught every driver on the judging panel what those three mean before they had a licence.",
+    "The canvas is asphalt and the section breaks are lane markings, because the sign is the figure and the road is the ground; a page that was all sign would be unreadable at speed.",
+    "Figures are tabular Overpass, because a column of lanes has to line up, and mono is barred as the personal fingerprint.",
+    "One motion only: a headlight sweep across a panel as it enters view, because retroreflective sheeting is the only way a sign has ever moved."
+  ],
+  "anti_brief": [
+    "no map tiles, truck icons, or a semi at golden hour",
+    "no blue anywhere: it is the category convention and the consumed AI accent",
+    "no monospace as a design family; terminal captures are shown as screens, not set as type",
+    "no pill buttons, no card grid of round numbers, no blockquote-with-left-border",
+    "no glow: retroreflection is flat matte sheeting, not emission"
+  ],
+  "expressive_axis": "colour: the green field. Everything else is restrained.",
+  "register": "plain-spoken",
+  "canvas": {
+    "posture": "mid-dark neutral, asphalt",
+    "dark_default": true,
+    "dark": { "road": "#2E3032", "shoulder": "#4A4C4E", "lane": "#D9D6CF", "sign": "#0A6B3F", "sign_edge": "#0F7F4B", "sign_shadow": "#071F13", "text_on_sign": "#F4F3EF", "warn": "#F5C400", "warn_text": "#161616", "stop": "#B8102E", "stop_text": "#F4F3EF", "road_text": "#E6E4DF", "road_muted": "#A9A7A2" },
+    "light": { "road": "#B4B5B2", "shoulder": "#CBCCC8", "lane": "#F6F5F2", "sign": "#0E7A47", "sign_edge": "#149255", "sign_shadow": "#0A4A2C", "text_on_sign": "#FFFFFF", "warn": "#FFCC00", "warn_text": "#161616", "stop": "#C41230", "stop_text": "#FFFFFF", "road_text": "#1E1F21", "road_muted": "#4E5052" }
+  },
+  "type": {
+    "voice": "read at 100 km/h",
+    "display": "Overpass 800",
+    "body": "Overpass 400/500",
+    "figures": "Overpass tabular-nums",
+    "mono": "none",
+    "scale_ratio": 1.333,
+    "base_px": 18
+  },
+  "structure": "vertical stack of sign panels on a road; exit tabs carry section numbers",
+  "edge_depth": {
+    "radius_panel_px": 10,
+    "radius_other_px": 0,
+    "edge": "1px rolled highlight inset + 1px darker outer",
+    "depth": "hard offset shadow, 0 blur, sheet metal on a gantry",
+    "bolts": "four 8px corner rivets per panel"
+  },
+  "motion": {
+    "signature": "headlight sweep: a diagonal white band crosses a panel once when it enters the viewport, 700ms ease-out",
+    "rest": "fully static",
+    "reduced_motion": "sweep disabled"
+  },
+  "ornament": "highway arrow, exit tab, corner bolts, dashed lane divider, retroreflective bead texture at 4% on sign panels"
+}
