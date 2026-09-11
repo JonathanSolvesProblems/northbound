@@ -6,7 +6,35 @@ This video is the entire presentation, since the entry is submitted remotely. Ta
 
 ---
 
-## Narration, with timings
+## Read this
+
+Straight through, at a normal speaking pace. About four minutes. Pause a beat between paragraphs; each one is a cut.
+
+Roadstar Trucking runs eighty-two trucks out of Milton, Ontario, into the United States. This hackathon handed me two months of their real dispatch history. I built Northbound on it, and the first thing the data did was prove me wrong.
+
+I assumed a Canadian carrier's problem is coming home empty from the Midwest. Their own records say otherwise. Six empty legs home. Two thousand miles. In two months. They are good at loading for home. The empty running is inside the States, between loads. Seven hundred and seventy-eight legs. A hundred and twenty-six thousand miles.
+
+Here is the part nobody prices. A Canadian truck cannot haul US freight that moves away from home. Everyone in the industry knows that. But the regulation is not a flat no. Nineteen CFR one twenty-three point fourteen says carriage as part of the return of the vehicle to its base country counts as incidental to international traffic. Which means it is allowed. So the rule is directional. It comes down to which way the load is going.
+
+Two hundred and seventeen of those empty legs were already pointed at the border. Sixty-six thousand seven hundred miles. Every one of them could legally have been carrying freight. At ATRI's published industry cost per mile, that is a hundred and fifty-five thousand dollars in two months, on running they were already paying for.
+
+Northbound is the load board that knows the difference. A dispatcher pastes the offer the way it arrived, a one-line message from a broker. GLM 5.2 on SPUR reads it. Van, forty-two thousand pounds, fourteen fifty all in, pickup on the twelfth. Then the law decides. Fairburn, Georgia to Walton, Kentucky is US domestic, and it is heading home. Amber. Worth a call to your broker, and here is the provision. Roadstar ran that exact lane empty ten times.
+
+Now the one that looks like easy money. Columbus to Atlanta, twenty-one hundred dollars, and your truck is sitting right there. Red. Not offered to this truck. Moving away from home is the cabotage violation the regulation warns about. Section five ninety-two liabilities, and the driver's B-1 admission at risk the next time he crosses. Twenty-one hundred dollars is not worth the truck.
+
+It also knows the clock changes at the bridge. Roadstar's own system tracks US and Canadian hours as separate columns, and eighty-eight percent of their drivers carry a different number on each. Driver eighty-four. Fifty-three hours on the US cycle. Eleven the moment he crosses. And the wait at the bridge never touches his driving limit. Past thirty minutes, it counts as the break he already owed. Live from CBP, both lanes.
+
+Now the one I did not expect. A hundred and twenty times in two months, a Roadstar truck ran empty toward the border within a hundred and fifty kilometres and forty-eight hours of a Roadstar load going to Ontario. Driver sixty-seven ran empty out of Fairburn, Georgia. The day before, their own load left Atlanta for Etobicoke. Those towns are twenty miles apart. Same company. Two trucks. One of them empty.
+
+Everyone at a sponsored hackathon says the sponsor's model was essential. I measured it. The same hundred offers, read twice. Once by GLM 5.2, once by a real regex parser with the model switched off. With the model, a hundred percent reach the correct legal verdict. Without it, forty. The regex handles a tidy header block just fine. It cannot read a chat message or a forwarded email, and that is what freight actually looks like.
+
+One more thing. Every number I just said is recomputed from the raw sheets by a script that fails the build if the prose and the data disagree. The first time I ran it, it caught four mistakes in my own writeup.
+
+Northbound. Your truck already drove that lane, empty. This finds the freight it could legally have carried.
+
+---
+
+## Narration, with timings (for editing)
 
 Opens on the page so a judge has the identity in three seconds, then cuts to the
 terminal wherever realness is the point. Every number spoken is one
