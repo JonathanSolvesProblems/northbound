@@ -6,13 +6,17 @@ and carries only the name and the one bold line. The gantry, the road margins,
 the second sentence, the buttons and every later section are hidden: at card
 size they were grey noise around a small green rectangle.
 
-    python scripts/thumbnail.py     -> broll/thumbnail-3x2.png (1200x800, PNG)
+    python scripts/thumbnail.py            -> broll/thumbnail-3x2.png  (1200x800, Devpost)
+    python scripts/thumbnail.py --youtube  -> broll/thumbnail-16x9.png (1280x720, YouTube)
 """
+import sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / 'broll' / 'thumbnail-3x2.png'
+YT = '--youtube' in sys.argv
+OUT = ROOT / 'broll' / ('thumbnail-16x9.png' if YT else 'thumbnail-3x2.png')
+CW, CH = (1280, 720) if YT else (1200, 800)
 URL = 'https://jonathansolvesproblems.github.io/northbound/'
 
 CSS = """
@@ -39,7 +43,7 @@ CSS = """
 
 with sync_playwright() as p:
     b = p.chromium.launch(headless=True)
-    ctx = b.new_context(viewport={'width': 1200, 'height': 800}, device_scale_factor=1, color_scheme='dark')
+    ctx = b.new_context(viewport={'width': CW, 'height': CH}, device_scale_factor=1, color_scheme='dark')
     pg = ctx.new_page()
     pg.goto(URL, wait_until='domcontentloaded', timeout=60_000)
     pg.evaluate('document.fonts.ready')
@@ -49,7 +53,7 @@ with sync_playwright() as p:
       b.innerHTML = b.textContent.replace('Empty.', '<span class="empty">Empty.</span>'); }""")
     pg.add_style_tag(content=CSS)
     pg.wait_for_timeout(800)
-    pg.screenshot(path=str(OUT), clip={'x': 0, 'y': 0, 'width': 1200, 'height': 800})
+    pg.screenshot(path=str(OUT), clip={'x': 0, 'y': 0, 'width': CW, 'height': CH})
     b.close()
 
-print(f'{OUT.relative_to(ROOT)}  1200x800  {OUT.stat().st_size // 1024} KB')
+print(f'{OUT.relative_to(ROOT)}  {CW}x{CH}  {OUT.stat().st_size // 1024} KB')
