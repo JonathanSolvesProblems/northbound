@@ -29,7 +29,7 @@ Northbound is a load board that knows which US freight a Canadian truck is legal
 
 A dispatcher pastes an offer the way it actually arrived, as a broker's email or a one-line chat message. GLM 5.2 on SPUR reads it into structured fields. Then the law decides: 19 CFR 123.14(c)(1) permits a foreign-based truck to carry US point-to-point freight only "as part of the return of the vehicle to its base country," so the verdict turns on which direction the load runs. Green is international. Red is moving away from home, and Northbound names the exposure: section 592 of the Tariff Act and the driver's B-1 admission. Amber is US domestic but heading home, surfaced with both citations and handed to the carrier's broker.
 
-It also plans the clock across the border, because the same driver has different hours on each side. Driver84 in Roadstar's roster shows 53 hours on his US cycle and 11 the moment he crosses. Border wait is priced live from CBP, commercial and FAST lanes separately, and a wait over 30 minutes is credited as the break the driver already owed.
+It also plans the clock across the border, because the same driver has different hours on each side. Driver84 in Roadstar's roster shows 53 hours on the US cycle and 11 the moment the truck crosses. Border wait is priced live from CBP, commercial and FAST lanes separately, and a wait over 30 minutes is credited as the break the driver already owed.
 
 And it looks back. In Roadstar's own history it found 217 empty legs, 66,702 miles, that were already travelling toward the border and could legally have carried freight: $155,815 at ATRI's published 2025 industry cost. 120 of those ran within 150 km and 48 hours of one of Roadstar's own loads going to Ontario. Fairburn, Georgia to Atlanta is twenty miles. Same company, two trucks, one of them empty.
 ```
@@ -45,7 +45,7 @@ The backtest reads their Dispatch sheet directly. Ground truth for every headlin
 
 Then I measured what the sponsor's model contributes rather than asserting it. The same offers, rendered from real orders in five broker formats, are read twice: GLM 5.2 versus a fair rules parser with the model switched off. With the model, 100% reach the correct legal verdict. Without it, 40%.
 
-Every number in the README is recomputed from the raw sheets by scripts/check_claims.py, which fails the build if the prose and the data disagree. It caught four mistakes in my own writeup the first time it ran. 31 tests lock the headline so a change to the geocoder cannot quietly move it.
+Every number in the README is recomputed from the raw sheets by scripts/check_claims.py, which fails the build if the prose and the data disagree. It caught four mistakes in my own writeup the first time it ran. Of the 31 tests, one exists only to lock the headline, so a change to the geocoder cannot quietly move it.
 ```
 
 ## Challenges I ran into
@@ -73,7 +73,7 @@ An ablation instead of an assertion. 100% versus 40% is a number about the spons
 ```
 Cabotage is directional, not binary, and the difference is worth six figures a quarter to one 82-truck carrier.
 
-A refusal is the most memorable thing a tool can do, if it names what it just prevented.
+A load board that says no, and says exactly why, is more useful to a dispatcher than one that says yes to everything. The red verdict naming section 592 is the screen people remember.
 
 Two independent implementations agreeing is worth more than one implementation with more tests. The Python analysis and the TypeScript engine compute the headline separately and match to the mile.
 ```

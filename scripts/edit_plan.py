@@ -40,7 +40,7 @@ def fix_words(words):
     out = []
     for i, w in enumerate(words):
         t = w['word'].strip()
-        nxt = words[i + 1]['word'].strip() if i + 1 < len(words) else ''
+        nxt = words[i + 1]['word'].strip().rstrip('.') if i + 1 < len(words) else ''   # 'twice.' is 'twice'
         prv = words[i - 1]['word'].strip() if i > 0 else ''
         if t == 'North' and nxt == 'Brown':
             out.append({**w, 'word': ' Northbound'}); continue
@@ -52,6 +52,14 @@ def fix_words(words):
             continue
         if t == 'red' and nxt == 'twice':
             out.append({**w, 'word': ' read'}); continue
+        if t == 'Carriage' and prv == 'says':
+            out.append({**w, 'word': ' carriage'}); continue
+        if t == 'Red' and nxt == 'not':
+            out.append({**w, 'word': ' Red.'}); continue
+        if t == 'not' and prv == 'Red':
+            out.append({**w, 'word': ' Not'}); continue
+        if t == 'this' and prv == 'MC,':
+            out.append({**w, 'word': ' This'}); continue
         if t == 'Then' and nxt == '42':
             out.append({**w, 'word': ' Van,'}); continue
         if t == '14' and nxt == '.50':
@@ -82,9 +90,12 @@ def glue_splits(words):
             out.append(w)
     return out
 
-for seg in TRANSCRIPT['segments']:
-    seg['words'] = glue_splits(fix_words(seg['words']))
-    seg['text'] = ''.join(w['word'] for w in seg['words']).strip()
+# proofread across the whole narration, not per Whisper segment: "section 519." ended
+# one segment and the stray "Two" opened the next, so a per-segment neighbour guard
+# never saw them together. The captioner flattens the words anyway.
+_words = glue_splits(fix_words([w for seg in TRANSCRIPT['segments'] for w in seg['words']]))
+TRANSCRIPT['segments'] = [{'start': _words[0]['start'], 'end': _words[-1]['end'],
+                           'text': ''.join(w['word'] for w in _words).strip(), 'words': _words}]
 
 # Whisper pins the first word to 0.00 even though the voice starts at 0.6s, so the
 # opening caption would sit on screen for half a second of silence right after
