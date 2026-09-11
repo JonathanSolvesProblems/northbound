@@ -110,6 +110,6 @@ if __name__ == '__main__':
         ('Northbound finds the freight it could legally have carried.', sub, TEXT),
         ('github.com/JonathanSolvesProblems/northbound', small, ACCENT),
     ], '11-close')
-    still_to_video(closing, 5, '11-close')
+    still_to_video(closing, 6, '11-close')
 
     print('cards written: 01-title, 11-close')

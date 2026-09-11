@@ -38,36 +38,36 @@ NPX = shutil.which('npx.cmd') or shutil.which('npx') or 'npx'
 SHOTS = [
     dict(id='02-empty-miles', title='Roadstar, two months, where the empty miles are',
          cmd=[PY, 'scripts/empty_miles.py'], show='python scripts/empty_miles.py',
-         focus='EMPTY LEGS BY DIRECTION', hold=6),
+         focus='EMPTY LEGS BY DIRECTION', hold=22),
     dict(id='03-the-rule', title='19 CFR 123.14(c)(1)',
          cmd=[PY, '-c', "t=open('LEGAL.md',encoding='utf-8').read();s=t.index('## Layer 1');e=t.index('## Layer 2');print(t[s:e].strip())"],
          show='sed -n "/Layer 1/,/Layer 2/p" LEGAL.md',
-         focus='general direction', hold=7),
+         focus='general direction', hold=10),
     dict(id='04-headline', title='217 legs that could legally have carried freight',
          cmd=[PY, 'scripts/fillable.py'], show='python scripts/fillable.py',
-         focus='At ATRI', hold=7),
+         focus='At ATRI', hold=12),
     dict(id='05-offer-amber', title='GLM 5.2 reads it, the law decides: AMBER',
          cmd=[NPX, 'tsx', 'src/cli/offer.ts', '--driver', 'Driver67',
               'van, Fairburn GA to Walton KY, pu 9/12 0700-1200, 42k, $1450 all in'],
          show='npx tsx src/cli/offer.ts --driver Driver67 "van, Fairburn GA to Walton KY, pu 9/12 0700-1200, 42k, $1450 all in"',
-         focus='AMBER', hold=8),
+         focus='AMBER', hold=28),
     dict(id='06-offer-red', title='The refusal, and what it prevented',
          cmd=[NPX, 'tsx', 'src/cli/offer.ts', '--driver', 'Driver18',
               "Hey, got a hot one. Columbus OH to Atlanta GA, loads tomorrow morning, 38,500 lbs dry van, paying $2,100. Your guy's sitting right there, can he grab it?"],
          show='npx tsx src/cli/offer.ts --driver Driver18 "Hey, got a hot one. Columbus OH to Atlanta GA, loads tomorrow morning, 38,500 lbs dry van, paying $2,100. Your guy\'s sitting right there, can he grab it?"',
-         focus='RED', hold=8),
+         focus='RED', hold=27),
     dict(id='07-board', title='Two rulebooks, one driver, live CBP',
          cmd=[NPX, 'tsx', 'src/cli/board.ts'], show='npx tsx src/cli/board.ts',
-         focus='LOSES 42.1h', hold=7),
+         focus='LOSES 42.1h', hold=21),
     dict(id='08-overlap', title='Empty trucks beside their own freight',
          cmd=[PY, 'scripts/overlap.py'], show='python scripts/overlap.py',
-         focus='FAIRBURN', hold=7),
+         focus='FAIRBURN', hold=29),
     dict(id='09-ablation', title='With the model, and without',
          cmd=[NPX, 'tsx', 'src/cli/ablation.ts', '100'], show='npx tsx src/cli/ablation.ts 100',
-         focus='CORRECT LEGAL VERDICT', hold=8, slow=True),
+         focus='CORRECT LEGAL VERDICT', hold=31, slow=True),
     dict(id='10-check-claims', title='The prose cannot drift from the data',
          cmd=[PY, 'scripts/check_claims.py'], show='python scripts/check_claims.py',
-         focus='PASS:', hold=5),
+         focus='PASS:', hold=14),
 ]
 
 # ------------------------------------------------------------------ player
@@ -133,11 +133,11 @@ run();
 # video shows is exactly what a judge opens.
 PAGE_URL = 'https://jonathansolvesproblems.github.io/northbound/'
 PAGE_SHOTS = [
-    dict(id='00-page-hero',     hold=5,  scroll_to=None),
+    dict(id='00-page-hero',     hold=16,  scroll_to=None),
     dict(id='00-page-scroll',   hold=2,  scroll_to='section.sign:nth-of-type(3)', glide=9),
-    dict(id='00-page-headline', hold=6,  scroll_to='section.sign:nth-of-type(3)'),
-    dict(id='00-page-verdicts', hold=6,  scroll_to='#verdicts', media=True),
-    dict(id='00-page-close',    hold=5,  scroll_to='footer'),
+    dict(id='00-page-headline', hold=13,  scroll_to='section.sign:nth-of-type(3)'),
+    dict(id='00-page-verdicts', hold=10,  scroll_to='#verdicts', media=True),
+    dict(id='00-page-close',    hold=8,  scroll_to='footer'),
 ]
 
 
@@ -182,9 +182,9 @@ def record_page(shot):
 # Every URL here is cited in README.md under "Sources".
 ARTICLE_SHOTS = [
     dict(id='12-cfr-123-14', url='https://www.law.cornell.edu/cfr/text/19/123.14',
-         find='return of the vehicle to its base country', hold=7),
+         find='return of the vehicle to its base country', hold=19),
     dict(id='13-atri-cost', url='https://truckingresearch.org/2026/07/new-atri-report-details-accelerating-costs-and-low-profitability-despite-cuts/',
-         find='2.336', hold=7),
+         find='2.336', hold=11),
     dict(id='14-cbp-waits', url='https://bwt.cbp.gov/', find=None, hold=8, glide=6),
     dict(id='15-cfr-395-3', url='https://www.law.cornell.edu/cfr/text/49/395.3',
          find='30-minute', hold=6),

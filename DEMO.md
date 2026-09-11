@@ -151,11 +151,20 @@ python scripts/cards.py            # title and end cards, with the headshot
 | `08-overlap.mp4` | 14s | the Fairburn / Atlanta pairing |
 | `09-ablation.mp4` | 14s | the `CORRECT LEGAL VERDICT` row, n = 100 |
 | `10-check-claims.mp4` | 11s | `PASS` |
-| `11-close.mp4` | 5s | branded card with tagline and repo |
+| `11-close.mp4` | 6s | branded card with tagline and repo |
+| `12-cfr-123-14.mp4` | 29s | 19 CFR 123.14 on Cornell LII, (c)(1) boxed, § 592 below it |
+| `13-atri-cost.mp4` | 18s | ATRI's July 2026 release, the $2.336 sentence boxed |
+| `14-cbp-waits.mp4` | 22s | bwt.cbp.gov, live, scrolling the crossings |
+| `15-cfr-395-3.mp4` | 10s | 49 CFR 395.3, the 30-minute break |
 
 Each clip opens on the command being typed, streams the real output, then eases to the line named above and holds. Beside each `.mp4` is a `.png` of the final frame and a `.txt` of the raw output, so anyone can confirm nothing on screen was edited.
 
-**Only the narration is left.** Record it against the script above, then either assemble with vidkit (`vidkit assemble narration.mp3 --clips-dir broll --out demo.mp4`) or drop the clips into any editor in numerical order.
+**The rule for the edit:** whenever the narration cites a number, the source is on screen. `scripts/edit_plan.py` authors the vidkit plan by hand so that is guaranteed: "19 CFR" cuts to Cornell, "ATRI" cuts to the July 2026 release, "live from CBP" cuts to bwt.cbp.gov. It also proofreads the Whisper transcript before captions burn in.
+
+```bash
+python scripts/edit_plan.py                                   # plan + padded narration
+vidkit assemble broll/narration/narration-padded.mp3 --clips-dir broll --edit-plan broll/demo.edit-plan.json --out broll/demo.mp4
+```
 
 ## Shot list, exact commands
 
