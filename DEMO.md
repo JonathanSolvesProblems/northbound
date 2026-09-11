@@ -219,3 +219,15 @@ github.com/JonathanSolvesProblems/northbound
 - Do not speed up or trim command output that would change a number.
 - Do not say "AI" where "GLM 5.2 on SPUR" is what happened. The sponsor's model is named every time it does something.
 - Do not add anything the script does not say. If a beat feels short, it is the right length.
+
+## The Short (28 s, 1080x1920)
+
+The red refusal on its own: `$2,100`, Columbus to Atlanta, not offered, the regulation quoted, "$2,100 is not worth the truck." Four portrait cards in the page's own sign language (`broll/short_shots.py`), rendered against the same narration cut from 130.0 s to 158.5 s of `narration.mp3`. Output `broll/short.mp4`, upload copy in `broll/short.metadata.md`.
+
+```bash
+python "$USERPROFILE/.claude/skills/create-short/assets/portrait_broll.py" broll/short_shots.py --out broll/vertical
+python "$USERPROFILE/.claude/skills/create-short/assets/make_short_plan.py" broll/demo.edit-plan.json --audio broll/narration/narration.mp3 --window 130.0 158.5 --clips-dir broll/vertical --out-plan broll/demo.short.edit-plan.json --out-audio broll/narration/narration.short.mp3
+# then split the one segment across 01-hook / 02-red / 03-law / 04-payoff at word boundaries (8.5, 15.3, 25.0 s)
+vidkit assemble broll/narration/narration.short.mp3 --clips-dir broll/vertical --edit-plan broll/demo.short.edit-plan.json --out broll/short.mp4
+ffmpeg -y -i broll/short.mp4 -c:v copy -c:a aac -ar 48000 -b:a 192k -movflags +faststart broll/short-48k.mp4 && mv -f broll/short-48k.mp4 broll/short.mp4
+```
