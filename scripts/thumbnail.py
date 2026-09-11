@@ -1,9 +1,10 @@
 """Devpost thumbnail: the hero sign, filling a 3:2 card.
 
 Rendered from the live page so it matches what a judge sees on the next click.
-The gallery card is about 250 px wide, so only the sign, the name, and the one
-bold line survive; the buttons and the second section are hidden, and nothing
-is cut off mid-sentence at the bottom.
+The gallery card is about 250 px wide, so the sign fills the frame edge to edge
+and carries only the name and the one bold line. The gantry, the road margins,
+the second sentence, the buttons and every later section are hidden: at card
+size they were grey noise around a small green rectangle.
 
     python scripts/thumbnail.py     -> broll/thumbnail-3x2.png (1200x800, PNG)
 """
@@ -15,14 +16,25 @@ OUT = ROOT / 'broll' / 'thumbnail-3x2.png'
 URL = 'https://jonathansolvesproblems.github.io/northbound/'
 
 CSS = """
-  main.road > *:not(.gantry):not(.hero) { display: none !important; }
-  main.road { padding-bottom: 0 !important; min-height: 100vh; }
-  .hero { margin-top: 64px !important; padding: 56px 52px 72px !important; }
-  .hero h1 { font-size: 136px !important; line-height: 1 !important; }
-  .hero .lede { font-size: 36px !important; line-height: 1.25 !important; margin-top: 30px !important; }
-  .hero .dim { font-size: 26px !important; line-height: 1.35 !important; margin-top: 22px !important; }
+  /* the sign IS the card: no gantry, no road margins, nothing a 250 px card cannot show */
+  main.road > *:not(.hero) { display: none !important; }
+  main.road { max-width: none !important; padding: 0 !important; margin: 0 !important; }
+  main.road::before, main.road::after { display: none !important; }
+  .hero { margin: 0 !important; position: fixed !important; inset: 22px !important;
+          padding: 0 !important; display: flex !important; flex-direction: column !important;
+          justify-content: center !important; align-items: flex-start !important;
+          padding-left: 64px !important; padding-right: 64px !important; box-sizing: border-box !important; }
+  .hero h1 { font-size: 140px !important; line-height: .92 !important; margin: 0 0 18px !important;
+             letter-spacing: -.03em !important; white-space: nowrap !important; }
+  .hero .lede { font-size: 58px !important; line-height: 1.12 !important; margin: 24px 0 0 !important;
+                max-width: none !important; font-weight: 700 !important; }
+  .hero .lede b { display: block; }
+  .hero .lede .empty { color: var(--warn); }
+  .hero .lede-rest { display: none !important; }
+  .hero .dim { display: none !important; }
   .hero .routes { display: none !important; }
-  .hero .tab { font-size: 17px !important; }
+  .hero .tab { font-size: 22px !important; right: 48px !important; top: 0 !important;
+               padding: 10px 22px !important; }
 """
 
 with sync_playwright() as p:
@@ -31,6 +43,10 @@ with sync_playwright() as p:
     pg = ctx.new_page()
     pg.goto(URL, wait_until='domcontentloaded', timeout=60_000)
     pg.evaluate('document.fonts.ready')
+    pg.evaluate("""() => { const l = document.querySelector('.hero .lede'); const b = l.querySelector('b');
+      [...l.childNodes].filter(n => n !== b).forEach(n => { const s = document.createElement('span');
+        s.className = 'lede-rest'; s.textContent = n.textContent; l.replaceChild(s, n); });
+      b.innerHTML = b.textContent.replace('Empty.', '<span class="empty">Empty.</span>'); }""")
     pg.add_style_tag(content=CSS)
     pg.wait_for_timeout(800)
     pg.screenshot(path=str(OUT), clip={'x': 0, 'y': 0, 'width': 1200, 'height': 800})
