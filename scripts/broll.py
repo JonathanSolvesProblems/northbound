@@ -11,14 +11,18 @@ text is exactly what the command printed.
     python scripts/broll.py --page     # record the deployed project page, scrolling
     python scripts/broll.py --articles # record the cited sources, scrolled to the passage
 
-Output: broll/NN-name.mp4 (1920x1080, CRF 18) plus broll/NN-name.png (last frame)
-and broll/NN-name.txt (the raw captured output, for the record).
+Output: broll/NN-name.mp4 (1920x1080, CRF 18) plus broll/_stills/NN-name.png (last
+frame) and broll/NN-name.txt (the raw captured output, for the record). Stills live
+in their own folder because vidkit picks NN-name.png over NN-name.mp4 when both sit
+beside each other, and then the whole video renders as slides.
 """
 import json, os, re, subprocess, sys, time, shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BROLL = ROOT / 'broll'
+STILLS = BROLL / '_stills'
+STILLS.mkdir(parents=True, exist_ok=True)
 W, H = 1920, 1080
 
 # Load .env so the model-backed shots run live.
@@ -167,7 +171,13 @@ def record_page(shot):
             page.evaluate(f"document.querySelector('{shot['scroll_to']}').scrollIntoView({{block:'start', behavior:'smooth'}})")
             page.wait_for_timeout(1400)
         page.wait_for_timeout(int(shot['hold'] * 1000))
-        page.screenshot(path=str(BROLL / f'{shot["id"]}.png'))
+        if shot.get('then_click'):
+            # a second state on the same page (CBP: the FAST lane tab); print where the
+            # click lands in the recording so the edit plan can seek to just before it
+            page.get_by_text(shot['then_click'], exact=True).first.click()
+            print(f"   clicked {shot['then_click']!r} at ~{time.time() - t_rec:.1f}s into the clip")
+            page.wait_for_timeout(int(shot.get('hold_after', 3) * 1000))
+        page.screenshot(path=str(STILLS / f'{shot["id"]}.png'))
         video = page.video; ctx.close(); webm = Path(video.path()); browser.close()
     mp4 = BROLL / f'{shot["id"]}.mp4'
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(webm), '-vf', f'scale={W}:{H}:flags=lanczos,format=yuv420p',
@@ -185,7 +195,10 @@ ARTICLE_SHOTS = [
          find='return of the vehicle to its base country', hold=19),
     dict(id='13-atri-cost', url='https://truckingresearch.org/2026/07/new-atri-report-details-accelerating-costs-and-low-profitability-despite-cuts/',
          find='2.336', hold=11),
-    dict(id='14-cbp-waits', url='https://bwt.cbp.gov/', find=None, hold=8, glide=6),
+    # the port page, not the landing page: Ambassador Bridge commercial lanes, the
+    # busiest truck crossing on the Ontario border, GENERAL tab then FAST tab
+    dict(id='14-cbp-waits', url='https://bwt.cbp.gov/details/380001/COV', find='Current Wait',
+         box_up=1, hold=3, then_click='FAST', hold_after=4),
     dict(id='15-cfr-395-3', url='https://www.law.cornell.edu/cfr/text/49/395.3',
          find='30-minute', hold=6),
 ]
@@ -199,26 +212,31 @@ def record_article(shot):
         ctx = browser.new_context(viewport={'width': W, 'height': H}, record_video_dir=str(vid_dir),
                                   record_video_size={'width': W, 'height': H},
                                   user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36')
-        page = ctx.new_page()
+        page = ctx.new_page(); t_rec = time.time()
         page.goto(shot['url'], wait_until='domcontentloaded', timeout=60_000)
         page.wait_for_timeout(2500)
         # cookie banners are not evidence
         for label in ('Got it!', 'Accept All', 'Accept', 'I agree', 'OK'):
             try:
-                page.get_by_role('button', name=label, exact=False).first.click(timeout=1200); break
+                page.get_by_role('button', name=label, exact=False).first.click(timeout=500); break
+            except Exception:
+                pass
+            try:  # Cornell's banner is an <a>, not a button
+                page.get_by_text(label, exact=True).first.click(timeout=500); break
             except Exception:
                 pass
         page.wait_for_timeout(400)
         if shot.get('find'):
             # scroll the passage into the upper third and box it
-            found = page.evaluate("""(needle) => {
+            found = page.evaluate("""([needle, up]) => {
               const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
               let n; while ((n = walker.nextNode())) {
                 if (n.nodeValue && n.nodeValue.includes(needle)) {
-                  const el = n.parentElement; el.scrollIntoView({block:'center'});
+                  let el = n.parentElement; for (let i = 0; i < up; i++) el = el.parentElement;
+                  el.scrollIntoView({block:'center'});
                   el.style.outline = '4px solid #F5C400'; el.style.outlineOffset = '6px';
                   el.style.background = 'rgba(245,196,0,.12)'; return true; } }
-              return false; }""", shot['find'])
+              return false; }""", [shot['find'], shot.get('box_up', 0)])
             if not found:
                 print(f'   (passage not found on page: {shot["find"]!r})')
             page.wait_for_timeout(1200)
@@ -229,7 +247,13 @@ def record_article(shot):
                 page.evaluate(f"window.scrollTo(0, 900 * {e})")
                 page.wait_for_timeout(16)
         page.wait_for_timeout(int(shot['hold'] * 1000))
-        page.screenshot(path=str(BROLL / f'{shot["id"]}.png'))
+        if shot.get('then_click'):
+            # a second state on the same page (CBP: the FAST lane tab); print where the
+            # click lands in the recording so the edit plan can seek to just before it
+            page.get_by_text(shot['then_click'], exact=True).first.click()
+            print(f"   clicked {shot['then_click']!r} at ~{time.time() - t_rec:.1f}s into the clip")
+            page.wait_for_timeout(int(shot.get('hold_after', 3) * 1000))
+        page.screenshot(path=str(STILLS / f'{shot["id"]}.png'))
         video = page.video; ctx.close(); webm = Path(video.path()); browser.close()
     mp4 = BROLL / f'{shot["id"]}.mp4'
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(webm), '-vf', f'scale={W}:{H}:flags=lanczos,format=yuv420p',
@@ -281,7 +305,7 @@ def record(shot, lines):
             page.wait_for_function("document.title==='DONE'", timeout=int((est + 30) * 1000))
         except Exception:
             print('   (timed out waiting for playback end, keeping what was recorded)')
-        page.screenshot(path=str(BROLL / f'{shot["id"]}.png'))
+        page.screenshot(path=str(STILLS / f'{shot["id"]}.png'))
         video = page.video
         ctx.close()
         webm = Path(video.path())

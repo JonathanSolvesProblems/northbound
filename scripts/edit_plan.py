@@ -69,8 +69,21 @@ def fix_words(words):
         out.append(w if rep == t else {**w, 'word': ' ' + rep})
     return out
 
+def glue_splits(words):
+    """Whisper emits "$155" + ",000" and "88" + "%" as two tokens, the second with
+    no leading space. The caption renderer strips every token and joins them with
+    spaces, so the burned-in caption reads "$155 ,000". Fold each continuation
+    into the token before it."""
+    out = []
+    for w in words:
+        if out and not w['word'].startswith(' '):
+            out[-1] = {**out[-1], 'word': out[-1]['word'] + w['word'], 'end': w['end']}
+        else:
+            out.append(w)
+    return out
+
 for seg in TRANSCRIPT['segments']:
-    seg['words'] = fix_words(seg['words'])
+    seg['words'] = glue_splits(fix_words(seg['words']))
     seg['text'] = ''.join(w['word'] for w in seg['words']).strip()
 TRANSCRIPT['text'] = ' '.join(s['text'] for s in TRANSCRIPT['segments'])
 
@@ -81,17 +94,23 @@ S = lambda clip, a, b, lt='', ip=0.0: {
     'lower_third': lt, 'effect': 'none', **({'in_point': ip} if ip else {}),
 }
 segments = [
-    S('00-page-hero',       0.0,   15.4),
+    # the first 2.5s of the hero recording are the page loading cold (fonts, the
+    # 11 MB media); scene detect puts first paint at 2.57s, so start after it
+    S('00-page-hero',       0.0,   15.4, ip=2.7),
     S('02-empty-miles',    15.4,   37.8, "Roadstar's own dispatch history"),
     S('00-page-scroll',    37.8,   47.4),
     S('12-cfr-123-14',     47.4,   67.3, 'Source: 19 CFR 123.14(c)(1), Cornell LII'),
     S('00-page-headline',  67.3,   80.2),
-    S('13-atri-cost',      80.2,   91.8, 'Source: ATRI, July 2026'),
+    S('13-atri-cost',      80.2,   91.8, 'Source: ATRI, July 2026', ip=1.0),   # white until first paint at 0.93s
     S('00-page-verdicts',  91.8,  101.2),
     S('05-offer-amber',   101.2,  130.1, 'GLM 5.2 on SPUR, live'),
     S('06-offer-red',     130.1,  158.9, 'The refusal'),
     S('07-board',         158.9,  182.8, '34 real trucks, live CBP waits'),
-    S('14-cbp-waits',     182.8,  186.3, 'Source: bwt.cbp.gov, live', ip=9.0),
+    # the Ambassador Bridge commercial page: GENERAL tab for 1.6s, then the FAST tab,
+    # so "both lanes" is literally on screen. The click is at 10.2s in the encoded
+    # clip (scene detect), about 2.8s earlier than broll.py's wall-clock estimate,
+    # because Playwright's recording starts after the page is created.
+    S('14-cbp-waits',     182.8,  186.3, 'Source: bwt.cbp.gov, live', ip=8.6),
     S('08-overlap',       186.3,  215.9, "Their own order book"),
     S('09-ablation',      215.9,  247.4, 'n = 100, model on vs off'),
     S('10-check-claims',  247.4,  261.8, 'check_claims.py'),

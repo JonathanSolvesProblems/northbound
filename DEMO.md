@@ -157,14 +157,18 @@ python scripts/cards.py            # title and end cards, with the headshot
 | `14-cbp-waits.mp4` | 22s | bwt.cbp.gov, live, scrolling the crossings |
 | `15-cfr-395-3.mp4` | 10s | 49 CFR 395.3, the 30-minute break |
 
-Each clip opens on the command being typed, streams the real output, then eases to the line named above and holds. Beside each `.mp4` is a `.png` of the final frame and a `.txt` of the raw output, so anyone can confirm nothing on screen was edited.
+Each clip opens on the command being typed, streams the real output, then eases to the line named above and holds. Beside each `.mp4` is a `.txt` of the raw output, and `broll/_stills/` holds a `.png` of the final frame, so anyone can confirm nothing on screen was edited. (The stills live in their own folder because vidkit prefers `name.png` over `name.mp4` when both sit together, and then every beat renders as a slide.)
 
 **The rule for the edit:** whenever the narration cites a number, the source is on screen. `scripts/edit_plan.py` authors the vidkit plan by hand so that is guaranteed: "19 CFR" cuts to Cornell, "ATRI" cuts to the July 2026 release, "live from CBP" cuts to bwt.cbp.gov. It also proofreads the Whisper transcript before captions burn in.
 
 ```bash
 python scripts/edit_plan.py                                   # plan + padded narration
 vidkit assemble broll/narration/narration-padded.mp3 --clips-dir broll --edit-plan broll/demo.edit-plan.json --out broll/demo.mp4
+ffmpeg -y -i broll/demo.mp4 -c:v copy -c:a aac -ar 48000 -b:a 192k -movflags +faststart broll/demo-48k.mp4 && mv -f broll/demo-48k.mp4 broll/demo.mp4   # loudnorm leaves 96 kHz audio
+python scripts/check_video.py broll/demo.mp4                  # length, loudness, black frames, motion, blank openings, mid-beat frames
 ```
+
+`check_video.py` writes one frame from the middle of every beat to `broll/_frames/`. The last step is looking at them: the regulation, the ATRI release and the CBP page have to be the thing on screen while their number is spoken.
 
 ## Shot list, exact commands
 

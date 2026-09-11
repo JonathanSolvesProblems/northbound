@@ -82,7 +82,10 @@ def card(lines_below, out_name):
         y += f.size + 12 * S
 
     img = img.resize((W, H), Image.LANCZOS)
-    png = BROLL / f'{out_name}.png'
+    # the still goes beside the other stills, not beside the clip: vidkit takes
+    # NN-name.png over NN-name.mp4 when both exist
+    (BROLL / '_stills').mkdir(exist_ok=True)
+    png = BROLL / '_stills' / f'{out_name}.png'
     img.save(png)
     return png
 

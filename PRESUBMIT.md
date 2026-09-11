@@ -35,7 +35,7 @@ Run every row before pasting anything. A failed check is worth more than any rem
 |---|---|---|---|
 | Code, frozen | rules | https://github.com/JonathanSolvesProblems/northbound | **done**, public |
 | Project page | nice to have | https://jonathansolvesproblems.github.io/northbound/ | **done**, live |
-| Demo video, 3 to 5 min | rules | 16 clips in `broll/`, script in `DEMO.md` | **narration pending** (only Jonathan's voice) |
+| Demo video, 3 to 5 min | rules | `broll/demo.mp4`, 4m37s, 1080p, 48 kHz, -16.4 LUFS, `check_video.py` PASS | **done**, upload pending |
 | Live presentation, 10 to 15 min | rules | not attending; Corey emailed 10 Sep to confirm remote judging | **answer pending** |
 | Devpost submission | Devpost | `broll/submission.md` (form-shaped), `broll/thumbnail-3x2.png`, `docs/media/shots/` | paste pending |
 | Portal submission | portal Submissions tab | unknown fields, check before Sunday | check pending |
@@ -43,7 +43,7 @@ Run every row before pasting anything. A failed check is worth more than any rem
 ## Before paste, in order
 
 1. `npm run validate` green.
-2. Record narration from `DEMO.md`. Assemble: `vidkit assemble narration.mp3 --clips-dir broll --out demo.mp4`, or any editor with clips in numerical order.
+2. Watch `broll/demo.mp4` once end to end (the automated checks cover length, loudness, black frames, motion and blank openings, not taste).
 3. Upload the video. Confirm it plays logged out.
 4. Paste `broll/submission.md` field by field. It is shaped like the Devpost form: name, pitch, one story block, tags, links. Upload `broll/thumbnail-3x2.png` and the four images in `docs/media/shots/`.
 5. Open the live submission page in a private window. Read the tagline aloud.
