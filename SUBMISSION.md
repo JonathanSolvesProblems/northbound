@@ -98,4 +98,4 @@ typescript, node, glm-5.2, spur-compute, python, cbp-border-wait-times, geonames
 - "How I built it" names GLM 5.2 on SPUR four times and never describes it as doing the boring parts. That is deliberate.
 - Every number above is one `check_claims.py` verifies. Run `npm run validate` before pasting.
 - The ablation figures are from n = 100, recorded in `docs/ablation-n100.txt`, and locked by `check_claims.py`.
-- Repo: https://github.com/JonathanSolvesProblems/northbound. Video URL to add once uploaded.
+- Repo: https://github.com/JonathanSolvesProblems/northbound. Video: https://www.youtube.com/watch?v=SZRIDo7swCA. Write-up: https://jonathansolvesproblems.com/blog/northbound-canadian-cross-border-cabotage-load-board/

@@ -6,6 +6,8 @@ A load board for Canadian cross-border carriers. It reads a freight offer the wa
 
 Built for the RoadStar Hackathon 2026 on Roadstar Trucking's own dispatch data.
 
+**Demo video (4:37):** https://www.youtube.com/watch?v=SZRIDo7swCA · **Project page:** https://jonathansolvesproblems.github.io/northbound/ · **Write-up:** https://jonathansolvesproblems.com/blog/northbound-canadian-cross-border-cabotage-load-board/
+
 ---
 
 ## What their data said

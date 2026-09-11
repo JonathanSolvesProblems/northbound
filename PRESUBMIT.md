@@ -12,7 +12,7 @@ Run every row before pasting anything. A failed check is worth more than any rem
 | 2 | Demo runs on real evidence, nothing seeded | **PASS** | `grep -rniE "seed\|fixture\|stub\|mock"` over `src/` and `scripts/` returns nothing outside tests. Every b-roll clip is a real command on the real workbook, with the raw `.txt` beside it. |
 | 3 | Every form field proofread rendered, logged out | pending | Do after paste. Private window. Read the tagline aloud. |
 | 4 | Drafting file contains only final values | **PASS** | `SUBMISSION.md`: one fenced block per field, notes below every field. |
-| 5 | Public-access check, logged out | **PASS** for repo and page | Repo HTTP 200, page HTTP 200, OG image HTTP 200, clean clone runs `npm run validate`. Video and gallery pending. Gallery unpublished so far, which is ordinary. |
+| 5 | Public-access check, logged out | **PASS** for repo, page, video | Repo HTTP 200, page HTTP 200, OG image HTTP 200, clean clone runs `npm run validate`. Video on YouTube. Gallery unpublished so far, which is ordinary. |
 | 6 | Deliverables, each named and located | see below | |
 | 7 | Headline traces to the technology credited | **PASS** | Headline credited to Dispatch sheet + GeoNames + 19 CFR + ATRI, which produced it. GLM 5.2 credited for offer reading, and the ablation (n = 100) measures exactly that. |
 | 8 | The name's promise is visible in the demo | **PASS** | "Northbound" promises a load home for a Canadian truck. Shots 05, 06, 07 and the page's headline sign are that. The page is literally a northbound guide sign. |
@@ -35,7 +35,7 @@ Run every row before pasting anything. A failed check is worth more than any rem
 |---|---|---|---|
 | Code, frozen | rules | https://github.com/JonathanSolvesProblems/northbound | **done**, public |
 | Project page | nice to have | https://jonathansolvesproblems.github.io/northbound/ | **done**, live |
-| Demo video, 3 to 5 min | rules | `broll/demo.mp4`, 4m37s, 1080p, 48 kHz, -16.4 LUFS, `check_video.py` PASS | **done**, upload pending |
+| Demo video, 3 to 5 min | rules | https://www.youtube.com/watch?v=SZRIDo7swCA (4m37s, 1080p, `check_video.py` PASS) | **done**, public |
 | Live presentation, 10 to 15 min | rules | not attending; Corey emailed 10 Sep to confirm remote judging | **answer pending** |
 | Devpost submission | Devpost | `broll/submission.md` (form-shaped), `broll/thumbnail-3x2.png`, `docs/media/shots/` | paste pending |
 | Portal submission | portal Submissions tab | unknown fields, check before Sunday | check pending |
@@ -44,7 +44,7 @@ Run every row before pasting anything. A failed check is worth more than any rem
 
 1. `npm run validate` green.
 2. Watch `broll/demo.mp4` once end to end (the automated checks cover length, loudness, black frames, motion and blank openings, not taste).
-3. Upload the video. Confirm it plays logged out.
+3. Video is up. Confirm it plays logged out.
 4. Paste `broll/submission.md` field by field. It is shaped like the Devpost form: name, pitch, one story block, tags, links. Upload `broll/thumbnail-3x2.png` and the four images in `docs/media/shots/`.
 5. Open the live submission page in a private window. Read the tagline aloud.
 6. Screenshot the confirmation.
