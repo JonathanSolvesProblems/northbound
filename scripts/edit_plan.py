@@ -85,6 +85,12 @@ def glue_splits(words):
 for seg in TRANSCRIPT['segments']:
     seg['words'] = glue_splits(fix_words(seg['words']))
     seg['text'] = ''.join(w['word'] for w in seg['words']).strip()
+
+# Whisper pins the first word to 0.00 even though the voice starts at 0.6s, so the
+# opening caption would sit on screen for half a second of silence right after
+# the title card. Speech onset measured from the waveform (RMS > 0.02).
+first = TRANSCRIPT['segments'][0]['words'][0]
+first['start'] = max(first['start'], 0.55)
 TRANSCRIPT['text'] = ' '.join(s['text'] for s in TRANSCRIPT['segments'])
 
 # ------------------------------------------------------------ segments
