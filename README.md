@@ -11,6 +11,7 @@ Built for the RoadStar Hackathon 2026 on Roadstar Trucking's own dispatch data.
 | Demo video (4:37) | [youtube.com/watch?v=SZRIDo7swCA](https://www.youtube.com/watch?v=SZRIDo7swCA) |
 | Project page | [jonathansolvesproblems.github.io/northbound](https://jonathansolvesproblems.github.io/northbound/) |
 | Write-up | [How Northbound was built](https://jonathansolvesproblems.com/blog/northbound-canadian-cross-border-cabotage-load-board/) |
+| Devpost | [devpost.com/software/northbound](https://devpost.com/software/northbound) |
 
 ---
 
