@@ -16,7 +16,7 @@ import { haversineKm, CROSSINGS, type LatLon } from '../legal/geo';
 import { geocodeDesc, countryOf } from '../fleet/gazetteer';
 import { MIN_RETURN_PROGRESS_KM } from '../legal/cabotage';
 
-/** ATRI, "An Analysis of the Operational Costs of Trucking: 2025 Update". */
+/** ATRI, "An Analysis of the Operational Costs of Trucking", 2026 edition, reporting 2025 costs. */
 export const ATRI_COST_PER_MILE_2025 = 2.336;
 export const ATRI_MARGINAL_COST_PER_MILE_2025 = 1.854;
 

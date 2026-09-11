@@ -175,10 +175,10 @@ Not me. That is the point.
 | Which legs ran, how far, loaded or empty | Roadstar's own `Dispatch` sheet |
 | Truck positions and dual-clock hours | Roadstar's own `Driver` sheet |
 | Border wait times, commercial and FAST lanes | [CBP, live](https://bwt.cbp.gov/api/waittimes) |
-| What counts as heading home | 19 CFR 123.14(c)(1) |
-| Hours of service | 49 CFR 395.3 · SOR/2005-313 |
-| Cost per mile | ATRI, *Operational Costs of Trucking: 2025 Update* |
-| City coordinates | GeoNames |
+| What counts as heading home | [19 CFR 123.14(c)(1)](https://www.law.cornell.edu/cfr/text/19/123.14), verified against [govinfo](https://www.govinfo.gov/content/pkg/CFR-2023-title19-vol1/xml/CFR-2023-title19-vol1-sec123-14.xml) |
+| Hours of service | [49 CFR 395.3](https://www.law.cornell.edu/cfr/text/49/395.3) · [SOR/2005-313](https://laws-lois.justice.gc.ca/eng/regulations/SOR-2005-313/) |
+| Cost per mile | ATRI, [*An Analysis of the Operational Costs of Trucking*, 2026 edition](https://truckingresearch.org/2026/07/new-atri-report-details-accelerating-costs-and-low-profitability-despite-cuts/), reporting 2025 costs |
+| City coordinates | [GeoNames](https://download.geonames.org/export/dump/) |
 
 The headline is locked behind tests. If a change to the geocoder moves it, the suite fails rather than letting the pitch drift away from the data.
 

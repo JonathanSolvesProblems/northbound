@@ -173,7 +173,7 @@ And it repeats, which means it is fixable with standing agreements rather than l
 | Which legs ran, how far, loaded or empty | Roadstar's TMS `Dispatch` sheet | the judge's company |
 | City coordinates | GeoNames | GeoNames |
 | What counts as heading home | 19 CFR 123.14(c)(1) | US Congress / CBP |
-| Cost per mile | ATRI *Operational Costs of Trucking: 2025* | ATRI |
+| Cost per mile | ATRI *An Analysis of the Operational Costs of Trucking*, 2026 edition, reporting 2025 costs | ATRI |
 
 98.8% of legs resolved against the gazetteer. The 9 that did not are reported in the output rather than dropped.
 

@@ -162,6 +162,8 @@ RETIRED = {
     '42.0%':     'BTS gateway share with Buffalo mis-keyed; correct figure is 58.5%',
     '2,165,074': 'BTS gateway sum with Buffalo mis-keyed',
     'gets it home': 'the original pitch, retired when the data showed they already load for home',
+    '2025 Update': 'wrong ATRI edition. $2.336 is the 2025 cost, published in the 2026 edition (July 15 2026). The 2025 edition reports 2024 costs of $2.260',
+    '$2.260':      'the 2024 cost from the 2025 edition; the project cites 2025 costs',
 }
 
 

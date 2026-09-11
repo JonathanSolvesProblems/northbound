@@ -9,6 +9,7 @@ text is exactly what the command printed.
     python scripts/broll.py 05 06      # just these
     python scripts/broll.py --replay   # re-record from the captured .txt, no re-running
     python scripts/broll.py --page     # record the deployed project page, scrolling
+    python scripts/broll.py --articles # record the cited sources, scrolled to the passage
 
 Output: broll/NN-name.mp4 (1920x1080, CRF 18) plus broll/NN-name.png (last frame)
 and broll/NN-name.txt (the raw captured output, for the record).
@@ -175,6 +176,68 @@ def record_page(shot):
     return mp4
 
 
+# ------------------------------------------------------------------ article shots
+# When the narration cites a number, the source is on screen. Recorded from the
+# live URL, scrolled to the passage, with a light highlight so the eye lands on it.
+# Every URL here is cited in README.md under "Sources".
+ARTICLE_SHOTS = [
+    dict(id='12-cfr-123-14', url='https://www.law.cornell.edu/cfr/text/19/123.14',
+         find='return of the vehicle to its base country', hold=7),
+    dict(id='13-atri-cost', url='https://truckingresearch.org/2026/07/new-atri-report-details-accelerating-costs-and-low-profitability-despite-cuts/',
+         find='2.336', hold=7),
+    dict(id='14-cbp-waits', url='https://bwt.cbp.gov/', find=None, hold=8, glide=6),
+    dict(id='15-cfr-395-3', url='https://www.law.cornell.edu/cfr/text/49/395.3',
+         find='30-minute', hold=6),
+]
+
+
+def record_article(shot):
+    from playwright.sync_api import sync_playwright
+    vid_dir = BROLL / '_rec'; vid_dir.mkdir(exist_ok=True)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        ctx = browser.new_context(viewport={'width': W, 'height': H}, record_video_dir=str(vid_dir),
+                                  record_video_size={'width': W, 'height': H},
+                                  user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36')
+        page = ctx.new_page()
+        page.goto(shot['url'], wait_until='domcontentloaded', timeout=60_000)
+        page.wait_for_timeout(2500)
+        # cookie banners are not evidence
+        for label in ('Got it!', 'Accept All', 'Accept', 'I agree', 'OK'):
+            try:
+                page.get_by_role('button', name=label, exact=False).first.click(timeout=1200); break
+            except Exception:
+                pass
+        page.wait_for_timeout(400)
+        if shot.get('find'):
+            # scroll the passage into the upper third and box it
+            found = page.evaluate("""(needle) => {
+              const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+              let n; while ((n = walker.nextNode())) {
+                if (n.nodeValue && n.nodeValue.includes(needle)) {
+                  const el = n.parentElement; el.scrollIntoView({block:'center'});
+                  el.style.outline = '4px solid #F5C400'; el.style.outlineOffset = '6px';
+                  el.style.background = 'rgba(245,196,0,.12)'; return true; } }
+              return false; }""", shot['find'])
+            if not found:
+                print(f'   (passage not found on page: {shot["find"]!r})')
+            page.wait_for_timeout(1200)
+        elif shot.get('glide'):
+            steps = int(shot['glide'] * 60)
+            for i in range(1, steps + 1):
+                k = i / steps; e = 1 - (1 - k) ** 3
+                page.evaluate(f"window.scrollTo(0, 900 * {e})")
+                page.wait_for_timeout(16)
+        page.wait_for_timeout(int(shot['hold'] * 1000))
+        page.screenshot(path=str(BROLL / f'{shot["id"]}.png'))
+        video = page.video; ctx.close(); webm = Path(video.path()); browser.close()
+    mp4 = BROLL / f'{shot["id"]}.mp4'
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(webm), '-vf', f'scale={W}:{H}:flags=lanczos,format=yuv420p',
+                    '-r', '30', '-c:v', 'libx264', '-preset', 'fast', '-crf', '18', '-movflags', '+faststart', str(mp4)], check=True)
+    webm.unlink(missing_ok=True)
+    return mp4
+
+
 ANSI = re.compile(r'\x1b\[[0-9;]*[A-Za-z]')
 
 
@@ -256,7 +319,15 @@ def main():
             mp4 = record_page(shot)
             results.append((shot['id'], probe(mp4)))
             print(f'   -> {mp4.name}  {results[-1][1]}')
-    if '--page' in args and not want:
+    if '--articles' in args or any(w.startswith(('12','13','14','15')) for w in want):
+        for shot in ARTICLE_SHOTS:
+            if want and not any(shot['id'].startswith(w) for w in want) and '--articles' not in args:
+                continue
+            print(f'\n[{shot["id"]}] recording {shot["url"][:60]}')
+            mp4 = record_article(shot)
+            results.append((shot['id'], probe(mp4)))
+            print(f'   -> {mp4.name}  {results[-1][1]}')
+    if ('--page' in args or '--articles' in args) and not want:
         chosen = []
     else:
         chosen = [s for s in SHOTS if not want or any(s['id'].startswith(w) for w in want)]

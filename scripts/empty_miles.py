@@ -13,7 +13,7 @@ SRC = 'data/raw/sheets/dispatch.csv'
 NULLS = {'', '<null>', 'NULL', 'null', 'N/A'}
 CA_PROV = {'ON', 'QC', 'BC', 'AB', 'MB', 'SK', 'NS', 'NB', 'PE', 'NL', 'YT', 'NT', 'NU'}
 
-ATRI_PER_MILE = 2.336        # ATRI, Operational Costs of Trucking: 2025 Update
+ATRI_PER_MILE = 2.336        # ATRI, An Analysis of the Operational Costs of Trucking, 2026 edition (2025 costs)
 ATRI_MARGINAL_PER_MILE = 1.854
 
 
