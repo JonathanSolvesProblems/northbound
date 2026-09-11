@@ -22,6 +22,11 @@ from geocode import geocode, geocode_desc, country_of  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 DOCS = [os.path.join(ROOT, 'README.md'), os.path.join(ROOT, 'PHASE0.md')]
+# The paste files and the project page are judged artifacts too. Checked when present.
+for _extra in ('SUBMISSION.md', os.path.join('broll', 'submission.md'), os.path.join('docs', 'index.html')):
+    _p = os.path.join(ROOT, _extra)
+    if os.path.exists(_p):
+        DOCS.append(_p)
 DISPATCH = os.path.join(ROOT, 'data', 'raw', 'sheets', 'dispatch.csv')
 DRIVERS = os.path.join(ROOT, 'data', 'raw', 'sheets', 'driver.csv')
 

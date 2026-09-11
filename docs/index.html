@@ -63,14 +63,27 @@ body{
 a{color:inherit}
 a:focus-visible{outline:3px solid var(--warn);outline-offset:3px;border-radius:2px}
 .road{max-width:1120px;margin:0 auto;padding:0 28px 96px;position:relative}
-/* the shoulder line, full height, left of the signs */
-.road::before{content:"";position:absolute;left:6px;top:0;bottom:0;width:4px;background:var(--lane);opacity:.55}
-@media(max-width:720px){.road::before{display:none}}
+/* edge lines by the road's own convention: yellow on the median side, white on the shoulder */
+.road::before{content:"";position:absolute;left:6px;top:0;bottom:0;width:4px;background:var(--warn);opacity:.55}
+.road::after{content:"";position:absolute;right:6px;top:0;bottom:0;width:4px;background:var(--lane);opacity:.5}
+@media(max-width:720px){.road::before,.road::after{display:none}}
 
 /* lane marking between sections: a dashed centre line */
 .lane{height:96px;position:relative}
 .lane::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;
   background:repeating-linear-gradient(to bottom,var(--lane) 0 28px,transparent 28px 56px);opacity:.75}
+
+/* ---- the gantry the overhead sign hangs from ---- */
+.gantry{position:relative;height:46px;margin:40px 8px 0;
+  background-color:var(--shoulder);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46'%3E%3Cpath d='M0 0 L46 46 M46 0 L0 46' stroke='%23000' stroke-opacity='.35' stroke-width='3'/%3E%3C/svg%3E");
+  border-top:4px solid var(--road-muted);border-bottom:4px solid var(--road-muted);
+  box-shadow:0 5px 0 0 var(--sign-shadow)}
+.gantry::before,.gantry::after{content:"";position:absolute;top:100%;width:14px;height:22px;background:var(--road-muted);
+  box-shadow:3px 3px 0 0 var(--sign-shadow)}
+.gantry::before{left:12%}.gantry::after{right:12%}
+.hero{margin-top:22px!important}
+@media(max-width:720px){.gantry{display:none}.hero{margin-top:56px!important}}
 
 /* ---- the sign panel ---- */
 .sign{
@@ -161,8 +174,11 @@ tr.hot td:first-child::before{content:"";display:inline-block;width:11px;height:
 /* ---- screens: the software, mounted on the gantry ---- */
 figure{margin:28px 0 6px}
 figure video,figure img{width:100%;aspect-ratio:16/9;display:block;background:#000;border-radius:3px}
-.screen{background:var(--screen);padding:10px;border-radius:9px;
+.screen{background:var(--screen);padding:10px;border-radius:9px;position:relative;
   box-shadow:0 0 0 1px var(--screen-edge),4px 5px 0 0 var(--sign-shadow)}
+.screen::before,.screen::after{content:"";position:absolute;top:-6px;width:9px;height:9px;border-radius:50%;
+  background:var(--road-muted);box-shadow:inset 0 0 0 2px var(--sign-shadow)}
+.screen::before{left:18px}.screen::after{right:18px}
 figcaption{margin-top:12px;font-size:15px;color:var(--on-sign-dim)}
 figcaption b{color:#fff;font-weight:700}
 .two{display:grid;grid-template-columns:1fr;gap:22px}
@@ -208,7 +224,8 @@ footer a:hover{border-color:var(--lane)}
 
 <main class="road">
 
-  <!-- 0. overhead guide sign -->
+  <!-- 0. the gantry, and the overhead guide sign hanging from it -->
+  <div class="gantry" aria-hidden="true"></div>
   <header class="sign hero" style="margin-top:56px">
     <span class="sweep"></span>
     <span class="tab">RoadStar Hackathon 2026</span>
